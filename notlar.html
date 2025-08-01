@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Çok Yakında</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .coming-soon {
+      font-size: 3rem;
+      color: white;
+      animation: pulse 2s infinite;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      margin-bottom: 40px;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+    }
+
+    .back-button {
+      padding: 12px 24px;
+      background-color: white;
+      color: #ff6f91;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #ff6f91;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="coming-soon">ÇOK YAKINDA</div>
+  <a href="index.html" class="back-button">Menüye Geri Dön</a>
+</body>
+</html>
+<footer style="
+  margin-top: 40px;
+  padding: 12px 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.7);
+  user-select: none;
+  font-weight: 500;
+  font-family: 'Segoe UI', sans-serif;
+">
+  BatuhanArda tarafından Dünyalar Güzeli Sevgilisi Ecrin'e hazırlanmıştır 💖
+</footer>

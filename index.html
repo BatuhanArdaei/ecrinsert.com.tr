@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Romantik Menü - PIN Girişi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Senin orijinal stillerin burada */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
+      background-size: 400% 400%;
+      animation: gradientChange 15s ease infinite;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+      padding: 20px;
+    }
+    @keyframes gradientChange {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    nav {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 20px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+      transition: all 0.3s ease;
+    }
+    nav a:hover {
+      color: #ffd6ec;
+      text-shadow: 0 0 10px white;
+    }
+    /* PIN form stilleri */
+    #pin-form {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 30px 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 350px;
+      width: 100%;
+    }
+    #pin-input {
+      font-size: 2.5rem;
+      text-align: center;
+      width: 100%;
+      max-width: 220px;
+      padding: 15px;
+      border-radius: 15px;
+      border: none;
+      outline: none;
+      margin-bottom: 20px;
+      letter-spacing: 25px;
+      background: rgba(255,255,255,0.3);
+      color: white;
+      font-weight: 700;
+      user-select: none;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+    #pin-input::-webkit-inner-spin-button,
+    #pin-input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    #pin-submit {
+      padding: 15px 30px;
+      font-size: 1.3rem;
+      border: none;
+      border-radius: 15px;
+      background-color: #ff9a9e;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      max-width: 220px;
+    }
+    #pin-submit:hover {
+      background-color: #ff6a6a;
+    }
+    #error-msg {
+      margin-top: 10px;
+      color: #ff4a4a;
+      font-weight: 700;
+      display: none;
+      user-select: none;
+    }
+    @media (max-width: 400px) {
+      #pin-input {
+        font-size: 2rem;
+        letter-spacing: 18px;
+      }
+      #pin-submit {
+        font-size: 1.1rem;
+        padding: 12px 20px;
+      }
+      nav a {
+        margin: 0 10px;
+        font-size: 16px;
+      }
+      nav {
+        padding: 15px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PIN GİRİŞ FORMU -->
+  <form id="pin-form" onsubmit="return checkPin()">
+    <input id="pin-input" type="tel" maxlength="4" placeholder="PIN" inputmode="numeric" pattern="[0-9]{4}" autocomplete="off" />
+    <button id="pin-submit" type="submit">Giriş</button>
+    <div id="error-msg">PIN yanlış, tekrar dene.</div>
+  </form>
+
+  <!-- MENÜ -->
+  <div id="menu" style="display:none;">
+    <h1>Canım Sevgilim'e Özel Menü</h1>
+    <nav>
+      <a href="/muzik-oneri.html">🎶 Müzik Öneri</a>
+      <a href="/oyunlar/puzzle.html">🧩 Puzzle</a>
+      <a href="/notlar.html">💌 Notlar</a>
+    </nav>
+  </div>
+
+  <script>
+    const correctPin = "2007"; // Buraya istediğin PIN
+
+    const pinForm = document.getElementById('pin-form');
+    const pinInput = document.getElementById('pin-input');
+    const errorMsg = document.getElementById('error-msg');
+    const menu = document.getElementById('menu');
+
+    function showMenu() {
+      pinForm.style.display = 'none';
+      menu.style.display = 'block';
+    }
+
+    function checkPin() {
+      const enteredPin = pinInput.value.trim();
+      if (enteredPin === correctPin) {
+        localStorage.setItem('pinAccess', 'granted');
+        showMenu();
+        return false; // formun submit olmasını engelle
+      } else {
+        errorMsg.style.display = 'block';
+        setTimeout(() => errorMsg.style.display = 'none', 2500);
+        pinInput.value = '';
+        pinInput.focus();
+        return false;
+      }
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem('pinAccess') === 'granted') {
+        showMenu();
+      } else {
+        pinForm.style.display = 'flex';
+        menu.style.display = 'none';
+      }
+    }
+  </script>
+
+</body>
+</html>
+<footer style="
+  margin-top: 40px;
+  padding: 12px 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  user-select: none;
+  font-weight: 500;
+  font-family: 'Segoe UI', sans-serif;
+">
+  BatuhanArda tarafından Dünyalar Güzeli Sevgilisi Ecrin'e hazırlanmıştır 💖
+</footer>
