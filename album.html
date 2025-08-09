@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Albüm - Foto/Video Yükle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="album.css">
+</head>
+<body>
+  <header>
+    <h1>Albüm</h1>
+    <button id="goHomeBtn">Ana Sayfa</button>
+  </header>
+
+  <main class="playlist-grid" id="pageMain">
+    <!-- Left panel: actions -->
+    <section class="playlist-box" style="display:flex;flex-direction:column;gap:14px;">
+      <h2>Yükleme</h2>
+      <input id="fileInput" type="file" multiple accept="image/*,video/*" style="display:none;">
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button id="uploadBtn">📷 Fotoğraf/Video Yükle</button>
+        <button id="refreshBtn">🔄 Yenile</button>
+      </div>
+      <p style="margin:0;opacity:.9;">Birden fazla dosya seçebilirsin. Yüklenince aşağıda görünür.</p>
+    </section>
+
+    <!-- Right panel: gallery -->
+    <section class="playlist-box" style="grid-column: span 1 / auto;">
+      <h2>Galeri</h2>
+      <div id="gallery" class="gallery-grid"></div>
+    </section>
+  </main>
+
+  <script src="album.js" defer></script>
+</body>
+</html>

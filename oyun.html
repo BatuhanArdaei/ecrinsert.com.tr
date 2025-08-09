@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Capybara Portakal Peşinde!</title>
+  <title>Capybara Cozy Springs</title>
   <style>
     /* ==== Pastel menu theme + mobile controls ==== */
     :root{
@@ -23,7 +23,7 @@
       display:flex; flex-direction:column; align-items:center;
     }
 
-    /* Header like your entry page vibe */
+    /* Header */
     header{
       width:100%; padding:15px 20px; position:sticky; top:0; z-index:10;
       background:rgba(255,255,255,.9);
@@ -88,7 +88,7 @@
     .mobile-arrows{
       position:fixed; inset:auto 0 14px 0; width:100%;
       display:flex; justify-content:space-between; align-items:center;
-      padding:0 14px; pointer-events:none; /* container does not capture */
+      padding:0 14px; pointer-events:none;
     }
     .arrow{
       pointer-events:auto; width:100px; height:100px; border-radius:18px;
@@ -101,7 +101,7 @@
     }
     .arrow svg{width:64px; height:64px; opacity:.9}
     .arrow:active{transform:scale(.96)}
-    @media (min-width:721px){ .mobile-arrows{display:none} } /* only show on mobile width */
+    @media (min-width:721px){ .mobile-arrows{display:none} }
   </style>
 </head>
 <body>
@@ -124,13 +124,13 @@
   <div class="overlay show" id="startOverlay">
     <div class="panel">
       <h1 class="title">Capybara Cozy Springs</h1>
-      <p class="subtitle">Capybara kaplıcada portakal toplar, sivrisineklerden kaçar. Ne kadar uzun yaşarsan o kadar puan!</p>
+      <p class="subtitle">Capybara kaplicada portakal toplar, sivrisineklerden kacar. Skor sadece portakal toplayinca artar.</p>
       <p>
         <span class="kbd">A</span>/<span class="kbd">←</span> Sola ·
-        <span class="kbd">D</span>/<span class="kbd">→</span> Sağa ·
+        <span class="kbd">D</span>/<span class="kbd">→</span> Saga ·
         <span class="kbd">Space</span> Duraklat/Devam
       </p>
-      <button class="btn" id="startBtn">Başla</button>
+      <button class="btn" id="startBtn">Basla</button>
     </div>
   </div>
 
@@ -149,7 +149,7 @@
         <polyline points="15 18 9 12 15 6"></polyline>
       </svg>
     </button>
-    <button class="arrow" id="rightArrow" aria-label="Sağa">
+    <button class="arrow" id="rightArrow" aria-label="Saga">
       <svg viewBox="0 0 24 24" fill="none" stroke="#d33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
       </svg>
@@ -182,8 +182,8 @@
     // State
     const state = {
       running:false, paused:false,
-      timeMs:0,                 // total alive ms
-      score:0, high:0,
+      timeMs:0,                 // time only for difficulty/spawn
+      score:0, high:0, collected:0,
       lastSpawn:0, spawnEvery:700,
       speedScale:1
     };
@@ -207,7 +207,7 @@
 
     // Mobile hold helpers
     function hold(el, keyName){
-      let holding = false, tid=null;
+      let holding = false;
       const start = (ev)=>{ ev.preventDefault(); if(holding) return; holding=true; keys.add(keyName); };
       const end   = (ev)=>{ ev.preventDefault(); holding=false; keys.delete(keyName); };
       el.addEventListener('touchstart', start, {passive:false});
@@ -232,7 +232,7 @@
       reset();
       state.running = true;
       state.paused  = false;
-      lastT = performance.now(); // reset delta to avoid big jump
+      lastT = performance.now();
       requestAnimationFrame(loop);
     }
     function hardRestart(){
@@ -242,8 +242,16 @@
     function reset(){
       oranges.length = bugs.length = bubbles.length = hearts.length = 0;
       capy.x = cv.width*0.5; capy.vx=0; capy.alive=true;
-      state.timeMs = 0; state.score=0; state.lastSpawn=0; state.speedScale=1;
-      for(let i=0;i<40;i++) bubbles.push({x:Math.random()*cv.width, y:Math.random()*cv.height, r:1+Math.random()*3, vy:.2+.6*Math.random()});
+
+      state.timeMs = 0;               // only for difficulty
+      state.score  = 0;               // score from oranges only
+      state.collected = 0;
+      state.lastSpawn = 0;
+      state.speedScale = 1;
+
+      for(let i=0;i<40;i++){
+        bubbles.push({x:Math.random()*cv.width, y:Math.random()*cv.height, r:1+Math.random()*3, vy:.2+.6*Math.random()});
+      }
       updateScoreLabel();
     }
     function togglePause(){
@@ -284,7 +292,7 @@
     let lastT = 0;
     function loop(t){
       if(!state.running) return;
-      let dt = Math.min(33, t - lastT); // clamp
+      let dt = Math.min(33, t - lastT);
       lastT = t;
 
       if(!state.paused){
@@ -295,35 +303,34 @@
     }
 
     function update(dt){
-      // time & score (fixed: now increments reliably)
+      // time kept only for difficulty & spawn pacing
       state.timeMs += dt;
-      // base score by survival time + extras by oranges
-      state.score = Math.floor(state.timeMs / 25); // fast enough to feel rewarding
-      updateScoreLabel();
 
-      // difficulty curve
+      // difficulty
       state.speedScale = 1 + Math.min(2.2, state.timeMs / 35000);
 
-      // spawn
+      // spawn logic
       if(state.timeMs - state.lastSpawn > 500 / state.speedScale){
         (Math.random() < 0.7 ? spawnOrange : spawnBug)();
         state.lastSpawn = state.timeMs;
       }
 
-      // player move
+      // movement
       const move = (keys.has('left')?-1:0) + (keys.has('right')?1:0);
       capy.vx = move * capy.speed * (cv.width/960);
       capy.x += capy.vx;
       capy.x = Math.max(40, Math.min(cv.width-40, capy.x));
 
-      // oranges
+      // oranges => score only increases here
       for(let i=oranges.length-1;i>=0;i--){
         const g = oranges[i];
         g.y += g.vy * (cv.height/540);
+
         const bw=capy.w, bh=capy.h, bx=capy.x-bw/2, by=capy.y-bh/2;
         if(aabb(bx,by,bw,bh, g.x-g.r, g.y-g.r, g.r*2, g.r*2)){
           oranges.splice(i,1);
-          state.score += 15; // bonus
+          state.score += 15;
+          state.collected++;
           popHeart(g.x,g.y);
           updateScoreLabel();
         }else if(g.y - g.r > cv.height+20){
@@ -336,16 +343,25 @@
         const b = bugs[i];
         b.y += b.vy * (cv.height/540);
         b.x += Math.sin((state.timeMs*0.005)+b.phase) * 1.6;
+
         const bw=capy.w, bh=capy.h, bx=capy.x-bw/2, by=capy.y-bh/2;
         if(aabb(bx,by,bw,bh, b.x-10, b.y-6, 20,12)){ capy.alive=false; }
+
         if(b.y > cv.height+30) bugs.splice(i,1);
       }
 
       // bubbles
-      for(const b of bubbles){ b.y -= b.vy; if(b.y < -10){ b.y = cv.height+10; b.x = Math.random()*cv.width; } }
+      for(const b of bubbles){
+        b.y -= b.vy;
+        if(b.y < -10){ b.y = cv.height+10; b.x = Math.random()*cv.width; }
+      }
 
       // hearts
-      for(let i=hearts.length-1;i>=0;i--){ const h=hearts[i]; h.a-=0.02; h.y-=0.5; if(h.a<=0) hearts.splice(i,1); }
+      for(let i=hearts.length-1;i>=0;i--){
+        const h=hearts[i];
+        h.a-=0.02; h.y-=0.5;
+        if(h.a<=0) hearts.splice(i,1);
+      }
 
       if(!capy.alive) endGame();
     }
@@ -357,13 +373,17 @@
       overOv.classList.add('show');
       pauseBtn.textContent = 'Duraklat';
     }
-    function updateScoreLabel(){ scoreEl.textContent = `Skor: ${state.score}`; }
+    function updateScoreLabel(){
+      scoreEl.textContent = `Skor: ${state.score}`;
+      // If you want to show collected count too, use:
+      // scoreEl.textContent = `Skor: ${state.score} · Portakal: ${state.collected}`;
+    }
     function popHeart(x,y){ hearts.push({x,y,a:1}); }
 
     function render(){
       ctx.clearRect(0,0,cv.width,cv.height);
 
-      // background (pastel same as page)
+      // background
       const g = ctx.createLinearGradient(0,0,0,cv.height);
       g.addColorStop(0,'#f7d9e6'); g.addColorStop(1,'#bdeaea');
       ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
@@ -391,7 +411,7 @@
       for(const h of hearts){ ctx.globalAlpha=h.a; drawHeart(h.x,h.y,10); ctx.globalAlpha=1; }
     }
 
-    // Drawing helpers
+    // Drawing helpers (no Turkish chars in comments)
     function rrect(x,y,w,h,r,fill){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); }
     function drawCapy(cx,cy,w,h){
       ctx.save(); ctx.translate(cx,cy);
