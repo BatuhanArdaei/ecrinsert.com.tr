@@ -1,75 +1,57 @@
-// NOTE: comments use ASCII only
-const uploadBtn = document.getElementById('uploadBtn');
-const refreshBtn = document.getElementById('refreshBtn');
-const fileInput  = document.getElementById('fileInput');
-const gallery    = document.getElementById('gallery');
-const goHomeBtn  = document.getElementById('goHomeBtn');
+const uploadBtn = document.getElementById("uploadBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const fileInput = document.getElementById("fileInput");
+const gallery = document.getElementById("gallery");
 
-goHomeBtn.addEventListener('click', () => {
-  // change if your home is different
-  window.location.href = '/';
-});
+uploadBtn.addEventListener("click", () => fileInput.click());
+refreshBtn.addEventListener("click", loadGallery);
 
-uploadBtn.addEventListener('click', () => fileInput.click());
-refreshBtn.addEventListener('click', () => loadGallery());
-
-fileInput.addEventListener('change', async (e) => {
-  const files = Array.from(e.target.files || []);
-  for (const f of files) {
-    await uploadOne(f);
-  }
-  fileInput.value = '';
+fileInput.addEventListener("change", async () => {
+  const files = Array.from(fileInput.files || []);
+  for (const file of files) await uploadOne(file);
+  fileInput.value = "";
   loadGallery();
 });
 
 async function uploadOne(file) {
-  const fd = new FormData();
-  fd.append('file', file);
   try {
-    const res = await fetch('upload.php', { method: 'POST', body: fd });
-    if (!res.ok) throw new Error('upload failed');
-    const data = await res.json(); // { ok, url, mime, name }
-    // optimistic add
-    addItemToGallery(data.url, data.mime, Date.now());
-  } catch (err) {
-    alert('Yukleme hatasi: ' + err.message);
-  }
-}
+    // 1) Tek kullanımlık upload URL al
+    const r1 = await fetch("/api/upload-url", { method: "POST" });
+    const s1 = await r1.json(); // { uploadUrl, pathname }
+    if (!r1.ok || !s1.uploadUrl) throw new Error("upload-url alinamadi");
 
-function addItemToGallery(url, mime, timeMs) {
-  const wrap = document.createElement('div');
-  wrap.className = 'item';
-  if (mime && mime.startsWith('image')) {
-    const img = document.createElement('img');
-    img.loading = 'lazy';
-    img.src = url;
-    wrap.appendChild(img);
-  } else {
-    const vid = document.createElement('video');
-    vid.src = url;
-    vid.controls = true;
-    wrap.appendChild(vid);
+    // 2) Dosyayi dogrudan Blob'a POST et
+    const r2 = await fetch(s1.uploadUrl, { method: "POST", body: file });
+    if (!r2.ok) {
+      const t = await r2.text();
+      throw new Error("Blob POST hatasi: " + t.slice(0,200));
+    }
+  } catch (e) {
+    alert("Yukleme hatasi: " + e.message);
   }
-  const meta = document.createElement('div');
-  meta.className = 'meta';
-  if (timeMs) meta.textContent = new Date(timeMs).toLocaleString('tr-TR');
-  wrap.appendChild(meta);
-  gallery.prepend(wrap);
 }
 
 async function loadGallery() {
+  gallery.innerHTML = "<p>Yükleniyor...</p>";
   try {
-    const res = await fetch('list.php');
-    if (!res.ok) throw new Error('list failed');
-    const items = await res.json(); // [{url,mime,mtime}]
-    gallery.innerHTML = '';
-    for (const it of items) {
-      addItemToGallery(it.url, it.mime, it.mtime * 1000);
-    }
+    const res = await fetch("/api/list");
+    const data = await res.json(); // [{url, size, uploadedAt, contentType}]
+    gallery.innerHTML = "";
+    data.forEach(it => {
+      const box = document.createElement("div");
+      box.className = "item";
+      if ((it.contentType || "").startsWith("video")) {
+        const v = document.createElement("video");
+        v.src = it.url; v.controls = true; box.appendChild(v);
+      } else {
+        const img = document.createElement("img");
+        img.src = it.url; box.appendChild(img);
+      }
+      gallery.appendChild(box);
+    });
   } catch (e) {
-    console.error(e);
+    gallery.innerHTML = "<p>Galeri yüklenemedi: " + e.message + "</p>";
   }
 }
 
-// initial
 loadGallery();
