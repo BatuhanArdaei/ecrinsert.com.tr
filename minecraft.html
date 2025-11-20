@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ecrin'in Dünyası 🌍</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    /* === GENEL AYARLAR === */
+    body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; user-select: none; -webkit-user-select: none; background-color: #87CEEB; }
+
+    /* === ARAYÜZ KATMANI === */
+    #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
+
+    #crosshair {
+      position: absolute; top: 50%; left: 50%; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.9); border-radius: 50%;
+      transform: translate(-50%, -50%); box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+
+    /* Uçma Modu Göstergesi */
+    #fly-indicator {
+      position: absolute; top: 20px; right: 20px; 
+      background: rgba(0,0,0,0.5); color: #00ff00; padding: 10px 20px;
+      border-radius: 20px; font-weight: bold; display: none;
+      backdrop-filter: blur(5px); border: 1px solid #00ff00;
+    }
+
+    /* === ENVANTER (HOTBAR) === */
+    #hotbar {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 10px; pointer-events: auto;
+      background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 15px;
+      backdrop-filter: blur(5px);
+    }
+
+    .slot {
+      width: 50px; height: 50px; border-radius: 10px;
+      border: 3px solid rgba(255,255,255,0.3); cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+      background-size: cover; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    .slot.active { border-color: #fff; transform: scale(1.15) translateY(-5px); box-shadow: 0 0 15px rgba(255,255,255,0.6); }
+    
+    .slot[data-type="dirt"] { background-color: #5d4037; border-top: 5px solid #4caf50; }
+    .slot[data-type="wood"] { background-color: #8d6e63; background-image: linear-gradient(0deg, transparent 90%, rgba(0,0,0,0.1) 50%); background-size: 100% 10px; }
+    .slot[data-type="iron"] { background-color: #e0e0e0; border: 2px solid #bdbdbd; }
+    .slot[data-type="red"]  { background-color: #ef5350; border: 2px solid #c62828; }
+
+    /* === MOBİL KONTROLLER === */
+    .mobile-controls { display: block; }
+    @media (min-width: 1024px) { .mobile-controls { display: none !important; } }
+
+    #joystick-zone {
+      position: absolute; bottom: 100px; left: 30px; width: 100px; height: 100px;
+      background: rgba(255, 255, 255, 0.1); border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+      pointer-events: auto; touch-action: none;
+    }
+    #joystick-knob {
+      position: absolute; top: 50%; left: 50%; width: 40px; height: 40px;
+      background: rgba(255, 255, 255, 0.4); border-radius: 50%; transform: translate(-50%, -50%);
+    }
+    .action-btn {
+      position: absolute; width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255,255,255,0.4);
+      color: white; font-size: 20px; display: flex; align-items: center; justify-content: center;
+      pointer-events: auto; touch-action: none; backdrop-filter: blur(4px);
+    }
+    .action-btn:active { background: rgba(255, 255, 255, 0.5); }
+    #btn-jump { bottom: 110px; right: 20px; width: 70px; height: 70px; background: rgba(255,255,255,0.15); font-size: 24px; }
+    #btn-place { bottom: 190px; right: 40px; }
+    #btn-break { bottom: 110px; right: 110px; }
+    /* Mobil için uçma butonu */
+    #btn-fly { bottom: 200px; left: 30px; width: 50px; height: 50px; font-size: 16px; background: rgba(0,255,0,0.2); }
+
+    /* === MENÜ === */
+    #menu-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 20; pointer-events: auto; transition: opacity 0.5s;
+    }
+    .menu-card { text-align: center; animation: float 6s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    
+    h1 {
+      font-size: 4rem; margin: 0; font-weight: 800; letter-spacing: -2px;
+      background: linear-gradient(to right, #fff, #ffd1dc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .subtitle { font-size: 1.1rem; color: rgba(255,255,255,0.8); margin-top: 5px; margin-bottom: 30px; }
+    
+    .start-btn {
+      background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 18px 60px; font-size: 1.2rem; color: white; font-weight: 600;
+      border-radius: 50px; cursor: pointer; backdrop-filter: blur(10px);
+      transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .start-btn:hover { background: white; color: #ff9a9e; transform: scale(1.05); }
+
+    .info-box { margin-top: 40px; font-size: 0.85rem; color: rgba(255,255,255,0.7); display: flex; flex-direction: column; gap: 5px; }
+    .key { color: #ffd1dc; font-weight: bold; border: 1px solid rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 4px; }
+
+    #back-link {
+      position: absolute; top: 30px; left: 30px; z-index: 30;
+      text-decoration: none; color: rgba(255,255,255,0.8); font-weight: 600;
+      background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" id="back-link">⬅ Menü</a>
+
+  <div id="menu-overlay">
+    <div class="menu-card">
+      <h1>ECRİN'İN DÜNYASI</h1>
+      <p class="subtitle">Hayal et ve İnşa Et</p>
+      <button class="start-btn" onclick="startGame()">OYNA</button>
+
+      <div class="info-box">
+        <div><span class="key">W,A,S,D</span> Yürü | <span class="key">SPACE</span> Zıpla</div>
+        <div><span class="key">Q</span> Uçma Modu (Aç/Kapa)</div>
+        <div><span class="key">SHIFT</span> Alçal (Uçarken)</div>
+        <div><span class="key">Sol Tık</span> Kır | <span class="key">Sağ Tık</span> Koy</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ui-layer">
+    <div id="crosshair"></div>
+    <div id="fly-indicator">UÇMA MODU AÇIK 🕊️</div>
+
+    <div id="hotbar">
+      <div class="slot active" data-type="dirt" onclick="selectBlock('dirt')"></div>
+      <div class="slot" data-type="wood" onclick="selectBlock('wood')"></div>
+      <div class="slot" data-type="iron" onclick="selectBlock('iron')"></div>
+      <div class="slot" data-type="red" onclick="selectBlock('red')"></div>
+    </div>
+
+    <div id="joystick-zone" class="mobile-controls"><div id="joystick-knob"></div></div>
+    <div id="btn-jump" class="action-btn mobile-controls">🦘</div>
+    <div id="btn-break" class="action-btn mobile-controls">🔨</div>
+    <div id="btn-place" class="action-btn mobile-controls">🧱</div>
+    <div id="btn-fly" class="action-btn mobile-controls">🕊️</div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.150.1/build/three.module.js';
+
+    let camera, scene, renderer;
+    let objects = [];
+    let materials = {};
+    let currentMaterialType = 'dirt';
+
+    // Fizik
+    let velocity = new THREE.Vector3();
+    let direction = new THREE.Vector3();
+    let prevTime = performance.now();
+    let isGrounded = false;
+    
+    // Hareket Ayarları
+    let moveSpeed = 200.0; // Hızı düşürdüm (Eskisi 400 idi)
+    
+    // Uçma Modu
+    let isFlying = false;
+    let flySpeed = 300.0;
+
+    // Kontroller
+    let moveForward = 0, moveRight = 0, moveUp = 0; // moveUp uçma için
+    let isPC = false;
+    let isLocked = false;
+
+    let pitchObject = new THREE.Object3D(); 
+    let yawObject = new THREE.Object3D();   
+
+    init();
+    animate();
+
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87CEEB);
+      scene.fog = new THREE.Fog(0x87CEEB, 10, 300);
+
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      pitchObject.add(camera);
+      yawObject.add(pitchObject);
+      yawObject.position.set(0, 15, 40); // Başlangıç konumu
+      scene.add(yawObject);
+
+      // Işıklar
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+      hemiLight.position.set(0, 200, 0);
+      scene.add(hemiLight);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      dirLight.position.set(100, 200, 50);
+      scene.add(dirLight);
+
+      // Materyaller
+      materials['dirt'] = createMaterial('#5d4037', '#4caf50');
+      materials['wood'] = createMaterial('#8d6e63', '#6d4c41');
+      materials['iron'] = createMaterial('#e0e0e0', '#bdbdbd');
+      materials['red']  = createMaterial('#ef5350', '#c62828');
+      materials['pink'] = createMaterial('#ff9a9e', '#ffc3a0'); // Yazı için
+
+      // Zemin
+      const floorGeo = new THREE.PlaneGeometry(2000, 2000, 20, 20);
+      floorGeo.rotateX(-Math.PI / 2);
+      const colors = [];
+      const color = new THREE.Color();
+      for(let i=0; i<floorGeo.attributes.position.count; i++) {
+          color.setHSL(Math.random()*0.1+0.28, 0.5, Math.random()*0.1+0.45); 
+          colors.push(color.r, color.g, color.b);
+      }
+      floorGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      const floorMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+      const floor = new THREE.Mesh(floorGeo, floorMat);
+      floor.position.y = 0;
+      floor.name = "floor";
+      scene.add(floor);
+      objects.push(floor);
+
+      createVoxelText(); // ECRİNİM yazısı
+      createHeartStructure(); // KALP yapısı
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      window.addEventListener('resize', onWindowResize);
+      setupPCControls();
+      setupTouchControls();
+    }
+
+    function createMaterial(mainColor, strokeColor) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = mainColor; ctx.fillRect(0, 0, 64, 64);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fillRect(0,0,32,32); ctx.fillRect(32,32,32,32);
+        ctx.lineWidth = 4; ctx.strokeStyle = strokeColor; ctx.strokeRect(0, 0, 64, 64);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        return new THREE.MeshLambertMaterial({ map: texture });
+    }
+
+    window.selectBlock = function(type) {
+        currentMaterialType = type;
+        document.querySelectorAll('.slot').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.slot[data-type="${type}"]`).classList.add('active');
+    };
+
+    // Klavye Kısayolları (1-4 Blok Seçim, Q Uçma)
+    window.addEventListener('keydown', (e) => {
+        if(e.key === '1') selectBlock('dirt');
+        if(e.key === '2') selectBlock('wood');
+        if(e.key === '3') selectBlock('iron');
+        if(e.key === '4') selectBlock('red');
+        if(e.code === 'KeyQ') toggleFly();
+    });
+
+    function toggleFly() {
+        isFlying = !isFlying;
+        velocity.y = 0; // Düşmeyi durdur
+        const indicator = document.getElementById('fly-indicator');
+        indicator.style.display = isFlying ? 'block' : 'none';
+    }
+
+    // === YAZI OLUŞTURMA ===
+    function createVoxelText() {
+        const letters = {
+            'E': [[1,1,1],[1,0,0],[1,1,1],[1,0,0],[1,1,1]],
+            'C': [[1,1,1],[1,0,0],[1,0,0],[1,0,0],[1,1,1]],
+            'R': [[1,1,0],[1,0,1],[1,1,0],[1,0,1],[1,0,1]],
+            'İ': [[0,1,0],[0,0,0],[0,1,0],[0,1,0],[0,1,0]],
+            'N': [[1,0,1],[1,1,1],[1,0,1],[1,0,1],[1,0,1]],
+            'M': [[1,0,1],[1,1,1],[1,0,1],[1,0,1],[1,0,1]]
+        };
+        const word = "ECRİNİM";
+        let startX = -35, startY = 2.5, startZ = -40;
+        for(let i=0; i<word.length; i++) {
+            let char = word[i];
+            let map = letters[char] || letters['E'];
+            for(let y=0; y<map.length; y++) {
+                for(let x=0; x<map[y].length; x++) {
+                    if(map[y][x] === 1) createBox(startX + x*5, startY + (4-y)*5, startZ, materials['pink']);
+                }
+            }
+            startX += 20;
+        }
+    }
+
+    // === KALP YAPISI ===
+    function createHeartStructure() {
+        // ECRİNİM yazısının sağına koyalım
+        let startX = 110; 
+        let startY = 2.5;
+        let startZ = -40;
+        
+        // Kalp Matrisi (1: Blok)
+        const heartMap = [
+            [0,1,0,1,0],
+            [1,1,1,1,1],
+            [1,1,1,1,1],
+            [0,1,1,1,0],
+            [0,0,1,0,0]
+        ];
+
+        for(let y=0; y<heartMap.length; y++) {
+            for(let x=0; x<heartMap[y].length; x++) {
+                if(heartMap[y][x] === 1) {
+                    // 4-y ile ters çevirip yukarı doğru çiziyoruz
+                    createBox(startX + x*5, startY + (4-y)*5, startZ, materials['red']);
+                }
+            }
+        }
+    }
+
+    function createBox(x, y, z, material = null) {
+        const mat = material || materials[currentMaterialType];
+        const geo = new THREE.BoxGeometry(5, 5, 5);
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y, z);
+        scene.add(mesh);
+        objects.push(mesh);
+        return mesh;
+    }
+
+    // === KONTROLLER ===
+    function setupPCControls() {
+        document.addEventListener('keydown', (e) => {
+            switch(e.code) {
+                case 'KeyW': moveForward = 1; break;
+                case 'KeyS': moveForward = -1; break;
+                case 'KeyA': moveRight = -1; break;
+                case 'KeyD': moveRight = 1; break;
+                case 'Space': 
+                    if(isFlying) { moveUp = 1; } 
+                    else if(isGrounded) { velocity.y += 130; isGrounded = false; } 
+                    break;
+                case 'ShiftLeft': if(isFlying) moveUp = -1; break;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            switch(e.code) {
+                case 'KeyW': case 'KeyS': moveForward = 0; break;
+                case 'KeyA': case 'KeyD': moveRight = 0; break;
+                case 'Space': case 'ShiftLeft': moveUp = 0; break;
+            }
+        });
+        
+        document.addEventListener('click', (e) => {
+            if(e.target.closest('#hotbar')) return;
+            if(document.getElementById('menu-overlay').style.opacity === '0') {
+                if(!isLocked) document.body.requestPointerLock();
+            }
+        });
+        document.addEventListener('pointerlockchange', () => { isLocked = !!document.pointerLockElement; isPC = true; });
+        document.addEventListener('mousemove', (e) => {
+            if (isLocked) {
+                yawObject.rotation.y -= e.movementX * 0.002;
+                pitchObject.rotation.x -= e.movementY * 0.002;
+                pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));
+            }
+        });
+        document.addEventListener('mousedown', (e) => {
+            if(isLocked) {
+                if(e.button === 0) interact('break');
+                if(e.button === 2) interact('place');
+            }
+        });
+    }
+
+    function setupTouchControls() {
+        // ... (Mobil joystick kodları aynı) ...
+        const joystickZone = document.getElementById('joystick-zone');
+        const knob = document.getElementById('joystick-knob');
+        let touchStart = { x: 0, y: 0 };
+        let touchLook = { x: 0, y: 0 };
+        let isMoving = false;
+
+        joystickZone.addEventListener('touchstart', (e) => { isMoving = true; isPC = false; touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY }; });
+        joystickZone.addEventListener('touchmove', (e) => {
+            if(!isMoving) return; e.preventDefault();
+            const dx = e.touches[0].clientX - touchStart.x;
+            const dy = e.touches[0].clientY - touchStart.y;
+            const dist = Math.min(35, Math.sqrt(dx*dx + dy*dy));
+            const angle = Math.atan2(dy, dx);
+            const mx = Math.cos(angle) * dist;
+            const my = Math.sin(angle) * dist;
+            knob.style.transform = `translate(calc(-50% + ${mx}px), calc(-50% + ${my}px))`;
+            moveRight = mx / 35; moveForward = -(my / 35);
+        });
+        joystickZone.addEventListener('touchend', () => { isMoving = false; moveForward = 0; moveRight = 0; knob.style.transform = `translate(-50%, -50%)`; });
+
+        document.addEventListener('touchstart', (e) => { if(e.changedTouches[0].clientX > window.innerWidth / 2) { touchLook.x = e.changedTouches[0].clientX; touchLook.y = e.changedTouches[0].clientY; } });
+        document.addEventListener('touchmove', (e) => {
+            if(e.changedTouches[0].clientX > window.innerWidth / 2) {
+                const dx = e.changedTouches[0].clientX - touchLook.x;
+                const dy = e.changedTouches[0].clientY - touchLook.y;
+                yawObject.rotation.y -= dx * 0.005;
+                pitchObject.rotation.x -= dy * 0.005;
+                pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));
+                touchLook.x = e.changedTouches[0].clientX;
+                touchLook.y = e.changedTouches[0].clientY;
+            }
+        });
+
+        // Mobil Butonlar
+        document.getElementById('btn-jump').addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            if(isFlying) { moveUp = 1; setTimeout(()=>moveUp=0, 200); } // Mobilde kısa süreli yüksel
+            else if(isGrounded) { velocity.y += 130; isGrounded = false; } 
+        });
+        document.getElementById('btn-break').addEventListener('touchstart', (e) => { e.preventDefault(); interact('break'); });
+        document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); interact('place'); });
+        document.getElementById('btn-fly').addEventListener('touchstart', (e) => { e.preventDefault(); toggleFly(); });
+    }
+
+    const raycaster = new THREE.Raycaster();
+    function interact(action) {
+        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+        const intersects = raycaster.intersectObjects(objects);
+        if(intersects.length > 0) {
+            const intersect = intersects[0];
+            if(intersect.distance > 60) return;
+            if(action === 'break') {
+                if(intersect.object.name === "floor") return;
+                scene.remove(intersect.object);
+                objects.splice(objects.indexOf(intersect.object), 1);
+            } else if (action === 'place') {
+                const pos = new THREE.Vector3().copy(intersect.point).add(intersect.face.normal.multiplyScalar(2.5));
+                pos.divideScalar(5).floor().multiplyScalar(5).addScalar(2.5);
+                // Oyuncunun içine koymayı engelle
+                const pPos = yawObject.position.clone(); pPos.y -= 5;
+                if(pos.distanceTo(pPos) < 6) return;
+                createBox(pos.x, pos.y, pos.z);
+            }
+        }
+    }
+
+    // Çarpışma
+    function checkCollision(newPos) {
+        if(isFlying) return false; // Uçarken çarpışma yok
+        const playerBox = new THREE.Box3();
+        playerBox.setFromCenterAndSize(newPos, new THREE.Vector3(2, 8, 2));
+        for (let i = 0; i < objects.length; i++) {
+            if(objects[i].name === "floor") continue;
+            const blockBox = new THREE.Box3().setFromObject(objects[i]);
+            if (playerBox.intersectsBox(blockBox)) return true;
+        }
+        return false;
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const time = performance.now();
+        const delta = (time - prevTime) / 1000;
+        
+        // UÇMA FİZİĞİ vs NORMAL FİZİK
+        if (isFlying) {
+            velocity.y = 0; // Yer çekimi yok
+            velocity.y += moveUp * flySpeed * delta; // Yukarı/Aşağı
+            // Sürüklenme (Drag) etkisi
+            velocity.x -= velocity.x * 5.0 * delta;
+            velocity.z -= velocity.z * 5.0 * delta;
+        } else {
+            velocity.y -= 9.8 * 30.0 * delta; // Yer çekimi
+            velocity.x -= velocity.x * 10.0 * delta; // Sürtünme
+            velocity.z -= velocity.z * 10.0 * delta;
+        }
+
+        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObject.quaternion);
+        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(yawObject.quaternion);
+        forward.y = 0; forward.normalize();
+        right.y = 0; right.normalize();
+
+        let currentSpeed = isFlying ? flySpeed : moveSpeed;
+
+        if (moveForward !== 0 || moveRight !== 0) {
+             velocity.x += (forward.x * moveForward + right.x * moveRight) * currentSpeed * delta;
+             velocity.z += (forward.z * moveForward + right.z * moveRight) * currentSpeed * delta;
+        }
+
+        // Hareket ve Çarpışma
+        let originalPos = yawObject.position.clone();
+        yawObject.position.x += velocity.x * delta;
+        let checkPos = yawObject.position.clone(); checkPos.y -= 5;
+        if(checkCollision(checkPos)) yawObject.position.x = originalPos.x;
+
+        originalPos = yawObject.position.clone();
+        yawObject.position.z += velocity.z * delta;
+        checkPos = yawObject.position.clone(); checkPos.y -= 5;
+        if(checkCollision(checkPos)) yawObject.position.z = originalPos.z;
+
+        yawObject.position.y += velocity.y * delta;
+
+        // Zemin Kontrolü
+        if (!isFlying && yawObject.position.y < 10) { 
+            velocity.y = 0; yawObject.position.y = 10; isGrounded = true; 
+        }
+
+        prevTime = time;
+        renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    window.startGame = function() {
+        const menu = document.getElementById('menu-overlay');
+        menu.style.opacity = '0';
+        setTimeout(() => {
+            menu.style.display = 'none';
+            document.getElementById('ui-layer').style.display = 'block';
+        }, 500);
+    };
+  </script>
+</body>
+</html>

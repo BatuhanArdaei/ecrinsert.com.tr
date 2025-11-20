@@ -2,7 +2,6 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-<<<<<<< HEAD
   <title>Ecrin & Batuhan - Özel Alan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <!-- Sevimli, yuvarlak hatlı bir font -->
@@ -161,13 +160,36 @@
       box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
 
-    .menu-item span { font-size: 1.8rem; } /* Emoji boyutu */
+    .menu-item span { font-size: 1.8rem; } 
 
     .menu-item:hover {
       transform: translateY(-5px);
       background: #fff;
       box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4);
       color: #ff7eb3;
+    }
+
+    /* MINECRAFT BUTONU İÇİN ÖZEL STİL */
+    .menu-item.minecraft {
+      grid-column: span 2; /* İki sütunu kaplasın */
+      background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(200, 240, 255, 0.6));
+      border: 2px solid rgba(255,255,255,0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-item.minecraft:hover {
+      box-shadow: 0 0 25px rgba(135, 206, 235, 0.6); /* Mavi elmas parıltısı */
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .menu-item.minecraft span {
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
     }
 
     /* === FOOTER === */
@@ -180,7 +202,7 @@
       color: rgba(255,255,255,0.8);
       z-index: 10;
       text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      pointer-events: none; /* Tıklamayı engelleme */
+      pointer-events: none; 
     }
 
     /* Mobil Düzenlemeler */
@@ -188,125 +210,10 @@
       .pin-box { width: 45px; height: 55px; font-size: 1.5rem; }
       .container { padding: 30px 20px; }
     }
-=======
-  <title>Romantik Menü - PIN Girişi</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    /* NOTE: comments use ASCII only */
-
-    /* === your original base === */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
-      background-size: 400% 400%;
-      animation: gradientChange 15s ease infinite;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-      padding: 20px;
-
-      /* leave room for bottom capy canvas */
-      padding-bottom: 140px;
-      overflow-x: hidden;
-    }
-    @keyframes gradientChange {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    nav {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 20px 40px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.25);
-      text-align: center;
-    }
-    nav a {
-      color: white;
-      margin: 0 20px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 18px;
-      transition: all .3s ease;
-    }
-    nav a:hover { color: #ffd6ec; text-shadow: 0 0 10px white; }
-
-    #pin-form {
-      background: rgba(255,255,255,0.15);
-      padding: 30px 40px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      max-width: 350px;
-      width: 100%;
-    }
-    #pin-input {
-      font-size: 2.5rem;
-      text-align: center;
-      width: 100%;
-      max-width: 220px;
-      padding: 15px;
-      border-radius: 15px;
-      border: none;
-      outline: none;
-      margin-bottom: 20px;
-      letter-spacing: 25px;
-      background: rgba(255,255,255,0.3);
-      color: white;
-      font-weight: 700;
-      user-select: none;
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-    }
-    #pin-input::-webkit-inner-spin-button,
-    #pin-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    #pin-submit {
-      padding: 15px 30px;
-      font-size: 1.3rem;
-      border: none;
-      border-radius: 15px;
-      background-color: #ff9a9e;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background-color .3s ease;
-      width: 100%;
-      max-width: 220px;
-    }
-    #pin-submit:hover { background-color: #ff6a6a; }
-    #error-msg { margin-top: 10px; color: #ff4a4a; font-weight: 700; display: none; user-select: none; }
-
-    @media (max-width: 400px) {
-      #pin-input { font-size: 2rem; letter-spacing: 18px; }
-      #pin-submit { font-size: 1.1rem; padding: 12px 20px; }
-      nav a { margin: 0 10px; font-size: 16px; }
-      nav { padding: 15px 20px; }
-    }
-
-    /* === decorative canvases === */
-    #butterCanvas, #capyCanvas {
-      position: fixed; left: 0; pointer-events: none; z-index: 0;
-    }
-    #butterCanvas { top: 0; width: 100vw; height: 40vh; opacity: .95; }
-    #capyCanvas { bottom: 0; width: 100vw; height: 120px; }
-
-    /* keep content above canvases */
-    #pin-form, #menu, footer { position: relative; z-index: 2; }
->>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa
   </style>
 </head>
 <body>
 
-<<<<<<< HEAD
   <!-- Arka plan: Uçuşan Kalpler -->
   <canvas id="bgCanvas"></canvas>
   <!-- Alt kısım: Yürüyen Kapibara -->
@@ -343,51 +250,27 @@
           <span>🧩</span> Puzzle
         </a>
         <a href="/oyun.html" class="menu-item">
-          <span>🎮</span> Oyun
+          <span>🐾</span> Kapibara
         </a>
         <a href="/notlar.html" class="menu-item">
           <span>💌</span> Notlar
         </a>
+        
+        <!-- YENİ EKLENEN MINECRAFT BUTONU -->
+        <a href="/minecraft.html" class="menu-item minecraft">
+          <span>🌍</span> Ecrin'in Dünyası
+        </a>
+
       </div>
     </div>
 
   </div>
 
   <footer>
-=======
-  <!-- top butterflies canvas -->
-  <canvas id="butterCanvas" aria-hidden="true"></canvas>
-  <!-- bottom capybara canvas -->
-  <canvas id="capyCanvas" aria-hidden="true"></canvas>
-
-  <!-- PIN GİRİŞ FORMU -->
-  <form id="pin-form" onsubmit="return checkPin()">
-    <input id="pin-input" type="tel" maxlength="4" placeholder="PIN" inputmode="numeric" pattern="[0-9]{4}" autocomplete="off" />
-    <button id="pin-submit" type="submit">Giriş</button>
-    <div id="error-msg">PIN yanlış, tekrar dene.</div>
-  </form>
-
-  <!-- MENÜ -->
-  <div id="menu" style="display:none; text-align:center;">
-    <h1>Canım Sevgilim'e Özel Menü</h1>
-    <nav>
-      <a href="/muzik-oneri.html">🎶 Müzik Öneri</a>
-      <a href="/oyunlar/puzzle.html">🧩 Puzzle</a>
-      <a href="/oyun.html">🎮 Oyun</a>
-      <a href="/notlar.html">💌 Notlar</a>
-    </nav>
-  </div>
-
-  <footer style="
-    margin-top: 40px; padding: 12px 0; width: 100%; text-align: center;
-    font-size: .9rem; color: rgba(255,255,255,.7); user-select: none; font-weight: 500;
-    font-family: 'Segoe UI', sans-serif; position: relative; z-index: 2;">
->>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa
     BatuhanArda tarafından Dünyalar Güzeli Sevgilisi Ecrin'e hazırlanmıştır 💖
   </footer>
 
   <script>
-<<<<<<< HEAD
     /* ================= PIN LOGIC ================= */
     const correctPin = "2007"; // Şifren
     const inputs = document.querySelectorAll('.pin-box');
@@ -402,25 +285,14 @@
     }
 
     inputs.forEach((input, index) => {
-      // Sadece rakam girişine izin ver
       input.addEventListener('input', (e) => {
         const val = e.target.value;
-        
-        if (!/^\d+$/.test(val)) {
-          e.target.value = "";
-          return;
-        }
-
+        if (!/^\d+$/.test(val)) { e.target.value = ""; return; }
         if (val.length === 1) {
-          if (index < inputs.length - 1) {
-            inputs[index + 1].focus();
-          } else {
-            checkPin();
-          }
+          if (index < inputs.length - 1) inputs[index + 1].focus();
+          else checkPin();
         }
       });
-
-      // Backspace ile geri git
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace' && !e.target.value) {
           if (index > 0) inputs[index - 1].focus();
@@ -433,20 +305,13 @@
       inputs.forEach(input => enteredPin += input.value);
 
       if (enteredPin === correctPin) {
-        // BAŞARILI
         localStorage.setItem('pinAccess', 'granted');
-        inputs.forEach(i => i.blur()); // Klavyeyi kapat
+        inputs.forEach(i => i.blur());
         showMenu(true);
       } else {
-        // HATALI
         statusMsg.style.opacity = '1';
         statusMsg.innerText = "Yanlış şifre, tekrar dene aşkım 🥺";
-        inputs.forEach(input => {
-          input.classList.add('shake');
-          input.value = '';
-        });
-        
-        // Titreme bitince sınıfı kaldır ve ilk kutuya odakla
+        inputs.forEach(input => { input.classList.add('shake'); input.value = ''; });
         setTimeout(() => {
           inputs.forEach(input => input.classList.remove('shake'));
           inputs[0].focus();
@@ -459,15 +324,11 @@
       if(animate) {
         pinScreen.style.display = 'none';
         menuContent.style.display = 'block';
-        
-        // Hafif bir geçiş efekti
         menuContent.style.opacity = 0;
         setTimeout(() => {
             menuContent.style.opacity = 1;
             menuContent.style.transition = 'opacity 0.5s ease';
         }, 50);
-        
-        // Başarılı giriş efekti (konfeti gibi)
         spawnHeartsExplosion(); 
       } else {
         pinScreen.style.display = 'none';
@@ -491,18 +352,15 @@
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = canvas.height + Math.random() * 100;
-        this.velY = Math.random() * -1.5 - 0.5; // Yukarı doğru
-        this.velX = Math.random() * 1 - 0.5;    // Sağa sola
+        this.velY = Math.random() * -1.5 - 0.5;
+        this.velX = Math.random() * 1 - 0.5;
         this.size = Math.random() * 15 + 5;
         this.color = `rgba(255, ${Math.floor(Math.random()*100 + 150)}, ${Math.floor(Math.random()*100 + 150)}, ${Math.random()*0.5 + 0.2})`;
       }
       update() {
         this.y += this.velY;
-        this.x += Math.sin(this.y * 0.01) * 0.5; // Hafif salınım
-        if(this.y < -50) { // Ekrandan çıkınca resetle
-          this.y = canvas.height + 50;
-          this.x = Math.random() * canvas.width;
-        }
+        this.x += Math.sin(this.y * 0.01) * 0.5;
+        if(this.y < -50) { this.y = canvas.height + 50; this.x = Math.random() * canvas.width; }
       }
       draw() {
         ctx.fillStyle = this.color;
@@ -511,47 +369,35 @@
       }
     }
 
-    // 30 tane kalp oluştur
     for(let i=0; i<30; i++) particles.push(new Heart());
 
     function animateBg() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
+      particles.forEach(p => { p.update(); p.draw(); });
       requestAnimationFrame(animateBg);
     }
     animateBg();
 
     function spawnHeartsExplosion() {
-      // Giriş başarılı olunca ekstra kalp patlaması
       for(let i=0; i<20; i++) {
          let h = new Heart();
-         h.y = canvas.height / 2;
-         h.x = canvas.width / 2;
-         h.velY = (Math.random() - 0.5) * 10;
-         h.velX = (Math.random() - 0.5) * 10;
+         h.y = canvas.height / 2; h.x = canvas.width / 2;
+         h.velY = (Math.random() - 0.5) * 10; h.velX = (Math.random() - 0.5) * 10;
          particles.push(h);
       }
     }
 
-
-    /* ================= CANVAS 2: KAPİBARA (Aynen Korundu & İyileştirildi) ================= */
+    /* ================= CANVAS 2: KAPİBARA ================= */
     (function() {
       const c = document.getElementById('capyCanvas');
       let ctxC, dpr, cssW, cssH;
       
       function setupHiDPICanvas() {
         dpr = Math.min(2, window.devicePixelRatio || 1);
-        cssW = window.innerWidth;
-        cssH = 140;
-        c.width = Math.floor(cssW * dpr);
-        c.height = Math.floor(cssH * dpr);
-        c.style.width = cssW + 'px';
-        c.style.height = cssH + 'px';
-        ctxC = c.getContext('2d');
-        ctxC.setTransform(dpr, 0, 0, dpr, 0, 0);
+        cssW = window.innerWidth; cssH = 140;
+        c.width = Math.floor(cssW * dpr); c.height = Math.floor(cssH * dpr);
+        c.style.width = cssW + 'px'; c.style.height = cssH + 'px';
+        ctxC = c.getContext('2d'); ctxC.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
       
       setupHiDPICanvas();
@@ -560,323 +406,53 @@
       const capy = { x: -60, y: cssH-40, w: 90, h: 55, dir: 1, speed: 50 }; 
 
       function rrect(x,y,w,h,r,fill){
-        ctxC.beginPath();
-        ctxC.moveTo(x+r,y);
-        ctxC.arcTo(x+w,y,x+w,y+h,r);
-        ctxC.arcTo(x+w,y+h,x,y+h,r);
-        ctxC.arcTo(x,y+h,x,y,r);
-        ctxC.arcTo(x,y,x+w,y,r);
-        ctxC.closePath();
-        ctxC.fillStyle = fill; ctxC.fill();
+        ctxC.beginPath(); ctxC.moveTo(x+r,y);
+        ctxC.arcTo(x+w,y,x+w,y+h,r); ctxC.arcTo(x+w,y+h,x,y+h,r);
+        ctxC.arcTo(x,y+h,x,y,r); ctxC.arcTo(x,y,x+w,y,r);
+        ctxC.closePath(); ctxC.fillStyle = fill; ctxC.fill();
       }
 
       function drawCapy(t) {
-        // Zemin Çizimi (Gradient)
         const g = ctxC.createLinearGradient(0, cssH-60, 0, cssH);
-        g.addColorStop(0, 'rgba(255,255,255,0)');
-        g.addColorStop(1, 'rgba(255,255,255,0.6)');
-        ctxC.fillStyle = g; 
-        ctxC.fillRect(0, cssH-60, cssW, 60);
+        g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,0.6)');
+        ctxC.fillStyle = g; ctxC.fillRect(0, cssH-60, cssW, 60);
 
         ctxC.save();
-        // Capy'i zemine oturt
         const bottomY = cssH - 20;
-        ctxC.translate(capy.x, bottomY - capy.h + 15); 
-        ctxC.scale(capy.dir, 1);
+        ctxC.translate(capy.x, bottomY - capy.h + 15); ctxC.scale(capy.dir, 1);
+        const walk = Math.sin(t*3.0); const bob = Math.sin(t*3.0)*1.5;
 
-        const walk = Math.sin(t*3.0);
-        const bob = Math.sin(t*3.0)*1.5;
-
-        // Ayaklar
         ctxC.fillStyle='#9c7a52';
         ctxC.fillRect(-capy.w*0.3, capy.h*0.6 + walk, 14, 8);
         ctxC.fillRect( capy.w*0.1, capy.h*0.6 - walk, 14, 8);
 
-        // Gövde
         rrect(-capy.w/2, -capy.h/2 + bob, capy.w, capy.h, 18, '#c59a6b');
         
-        // Kafa
         ctxC.save();
         ctxC.translate(capy.w*0.25, -capy.h*0.4 + bob);
         rrect(0, 0, capy.w*0.35, capy.h*0.4, 10, '#c59a6b');
-        // Göz & Burun
         ctxC.fillStyle='#222';
-        if (Math.sin(t*2) > 0.95) ctxC.fillRect(capy.w*0.15, capy.h*0.1, 8, 2); // Göz kırpma
+        if (Math.sin(t*2) > 0.95) ctxC.fillRect(capy.w*0.15, capy.h*0.1, 8, 2); 
         else { ctxC.beginPath(); ctxC.arc(capy.w*0.18, capy.h*0.1, 3, 0, Math.PI*2); ctxC.fill(); }
-        ctxC.fillRect(capy.w*0.3, capy.h*0.15, 4, 3); // Burun
-        // Yanak
+        ctxC.fillRect(capy.w*0.3, capy.h*0.15, 4, 3); 
         ctxC.fillStyle='rgba(255,100,100,0.3)';
         ctxC.beginPath(); ctxC.arc(capy.w*0.12, capy.h*0.2, 5, 0, Math.PI*2); ctxC.fill();
         ctxC.restore();
-
         ctxC.restore();
-=======
-    /* ===== PIN logic (unchanged) ===== */
-    const correctPin = "2007";
-    const pinForm = document.getElementById('pin-form');
-    const pinInput = document.getElementById('pin-input');
-    const errorMsg = document.getElementById('error-msg');
-    const menu = document.getElementById('menu');
-
-    function showMenu() { pinForm.style.display = 'none'; menu.style.display = 'block'; }
-    function checkPin() {
-      const enteredPin = pinInput.value.trim();
-      if (enteredPin === correctPin) {
-        localStorage.setItem('pinAccess', 'granted');
-        showMenu();
-        return false;
-      } else {
-        errorMsg.style.display = 'block';
-        setTimeout(() => errorMsg.style.display = 'none', 2500);
-        pinInput.value = ''; pinInput.focus();
-        return false;
-      }
-    }
-    window.onload = () => {
-      if (localStorage.getItem('pinAccess') === 'granted') showMenu();
-      else { pinForm.style.display = 'flex'; menu.style.display = 'none'; }
-      startButterflies();
-      startCapy();
-    };
-
-    /* ===== HiDPI helper ===== */
-    function setupHiDPICanvas(canvas, cssW, cssH){
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas.width = Math.max(1, Math.floor(cssW * dpr));
-      canvas.height = Math.max(1, Math.floor(cssH * dpr));
-      canvas.style.width = cssW + 'px';
-      canvas.style.height = cssH + 'px';
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
-      return { ctx, dpr, cssW, cssH };
-    }
-
-    /* ===== Butterflies (visible & cute) ===== */
-    function startButterflies(){
-      const c = document.getElementById('butterCanvas');
-      let { ctx, dpr, cssW, cssH } = setupHiDPICanvas(c, innerWidth, Math.floor(innerHeight * 0.40));
-
-      function fit(){
-        ({ ctx, dpr, cssW, cssH } = setupHiDPICanvas(c, innerWidth, Math.floor(innerHeight * 0.40)));
-      }
-      addEventListener('resize', fit);
-
-      const COLORS = ['#ffd1dc','#ffb3c1','#ffe0a3','#b3f5d0','#b8e1ff','#d1c2ff','#ffc7a8'];
-      const BUTTS = [];
-      const N = Math.max(14, Math.floor(cssW / 90));
-
-      function spawn(dir){
-        const y = Math.random() * (cssH * 0.85) + cssH*0.05;
-        const leftToRight = dir ?? (Math.random() < 0.5);
-        const x = leftToRight ? -30 : cssW + 30;
-        const speed = 40 + Math.random()*60;   // px/sec
-        const amp = 14 + Math.random()*26;     // sine amplitude
-        const col = COLORS[(Math.random()*COLORS.length)|0];
-        const size = 9 + Math.random()*11;     // wing scale
-        return {x,y,vx:(leftToRight?1:-1)*speed, t:Math.random()*Math.PI*2, amp, col, size, dir:leftToRight?1:-1};
-      }
-      for(let i=0;i<N;i++) BUTTS.push(spawn());
-
-      function drawButter(b){
-        ctx.save();
-        ctx.translate(b.x, b.y);
-        ctx.scale(b.dir, 1);
-        // body
-        ctx.fillStyle = '#4b4b4b';
-        ctx.fillRect(-2, -3, 4, 6);
-
-        // wing flap (0..1)
-        const flap = 0.5 + 0.5 * Math.sin(b.t*6);
-        const w1 = b.size*(1.0 + .6*flap);
-        const w2 = b.size*(0.9 + .6*flap);
-
-        ctx.globalAlpha = 0.92;
-        ctx.fillStyle = b.col;
-
-        // top wing
-        ctx.beginPath();
-        ctx.ellipse(-6, -6, w1, w1*0.7, -0.5, 0, Math.PI*2);
-        ctx.fill();
-
-        // bottom wing
-        ctx.beginPath();
-        ctx.ellipse(-6, 6, w2, w2*0.65, 0.5, 0, Math.PI*2);
-        ctx.fill();
-
-        // soft sparkle dot
-        ctx.globalAlpha = 0.35;
-        ctx.beginPath();
-        ctx.arc(-10, 0, 2.5, 0, Math.PI*2);
-        ctx.fill();
-
-        ctx.globalAlpha = 1;
-        ctx.restore();
->>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa
       }
 
       let last = performance.now();
       function loop(now){
-<<<<<<< HEAD
-        const dt = (now - last) / 1000;
-        last = now;
+        const dt = (now - last) / 1000; last = now;
         ctxC.clearRect(0,0,cssW,cssH);
-
-        // Hareket
         capy.x += capy.speed * capy.dir * dt;
-        if(capy.dir === 1 && capy.x > cssW + 50) { capy.dir = -1; } // Sağa gitti, dön
-        if(capy.dir === -1 && capy.x < -50) { capy.dir = 1; }     // Sola gitti, dön
-
-=======
-        const dt = Math.min(50, now - last); last = now;
-        const dtSec = dt / 1000;
-
-        ctx.clearRect(0, 0, cssW, cssH);
-
-        for(let i=BUTTS.length-1;i>=0;i--){
-          const b = BUTTS[i];
-          b.t += dtSec; // flap timer
-          b.x += b.vx * dtSec;
-          b.y += Math.sin(b.t * 2.0) * (b.amp * dtSec); // gentle drift
-          drawButter(b);
-
-          if((b.dir>0 && b.x > cssW + 40) || (b.dir<0 && b.x < -40)){
-            BUTTS[i] = spawn(b.dir<0); // alternate direction next time
-          }
-        }
-        requestAnimationFrame(loop);
-      }
-      requestAnimationFrame(loop);
-    }
-
-    /* ===== Capybara walker (cuter) ===== */
-    function startCapy(){
-      const c = document.getElementById('capyCanvas');
-      let { ctx, dpr, cssW, cssH } = setupHiDPICanvas(c, innerWidth, 120);
-
-      function fit(){
-        ({ ctx, dpr, cssW, cssH } = setupHiDPICanvas(c, innerWidth, 120));
-      }
-      addEventListener('resize', fit);
-
-      const capy = { x: cssW*0.2, y: cssH-50, w: 100, h: 60, dir: 1, speed: 55 }; // px/sec
-
-      function rrect(x,y,w,h,r,fill){
-        ctx.beginPath();
-        ctx.moveTo(x+r,y);
-        ctx.arcTo(x+w,y,x+w,y+h,r);
-        ctx.arcTo(x+w,y+h,x,y+h,r);
-        ctx.arcTo(x,y+h,x,y,r);
-        ctx.arcTo(x,y,x+w,y,r);
-        ctx.closePath();
-        ctx.fillStyle = fill; ctx.fill();
-      }
-
-      function drawGround(){
-        const g = ctx.createLinearGradient(0, cssH-80, 0, cssH);
-        g.addColorStop(0,'rgba(255,255,255,0.25)');
-        g.addColorStop(1,'rgba(255,255,255,0.6)');
-        ctx.fillStyle = g; ctx.fillRect(0, cssH-80, cssW, 80);
-
-        // tiny flowers
-        for(let i=0;i<12;i++){
-          const x = (i/12)*cssW + Math.sin(i)*8;
-          const y = cssH-20 - (i%2)*6;
-          ctx.fillStyle = i%3===0 ? '#ffd6e7' : (i%3===1 ? '#d4f8e8' : '#fff0b3');
-          ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
-        }
-      }
-
-      function drawCapy(t){
-        ctx.save();
-        ctx.translate(capy.x, capy.y);
-        ctx.scale(capy.dir, 1);
-
-        const walk = Math.sin(t*2.0);   // step cycle
-        const bob  = Math.sin(t*2.0)*2; // body bob
-        const headNod = Math.sin(t*1.6)*1.5;
-
-        // body
-        rrect(-capy.w/2, -capy.h/2 + bob, capy.w, capy.h, 20, '#c59a6b');
-        // belly
-        ctx.fillStyle='#b4895e';
-        ctx.fillRect(-capy.w/2+8, -capy.h/2+12 + bob, capy.w-16, capy.h-26);
-
-        // tail (wag)
-        ctx.save();
-        ctx.translate(-capy.w/2 + 10, -8 + bob);
-        ctx.rotate(Math.sin(t*6)*0.25);
-        rrect(-6,-3,12,6,3,'#9c7a52');
-        ctx.restore();
-
-        // head
-        ctx.save();
-        ctx.translate(capy.w*0.22, -capy.h*0.42 + bob + headNod);
-        rrect(0, 0, capy.w*0.40, capy.h*0.42, 12, '#c59a6b');
-
-        // ear
-        rrect(capy.w*0.26, -capy.h*0.14, capy.w*0.16, capy.h*0.18, 6, '#9c7a52');
-
-        // eye (blink)
-        const blink = (Math.sin(t*4)+1)/2 < 0.12;
-        ctx.fillStyle='#111';
-        if(blink){
-          ctx.fillRect(capy.w*0.10, capy.h*0.06, 10, 2);
-        }else{
-          ctx.beginPath(); ctx.arc(capy.w*0.14, capy.h*0.05, 3.8, 0, Math.PI*2); ctx.fill();
-        }
-
-        // blush cheeks
-        ctx.globalAlpha = 0.35;
-        ctx.fillStyle = '#ff9db5';
-        ctx.beginPath(); ctx.ellipse(capy.w*0.07, capy.h*0.12, 7.5, 4.5, 0, 0, Math.PI*2); ctx.fill();
-        ctx.globalAlpha = 1;
-
-        // nose
-        ctx.fillStyle='#1b1b1b';
-        ctx.fillRect(capy.w*0.28, capy.h*0.12, 6, 4);
-        ctx.restore();
-
-        // feet (gentle step)
-        ctx.fillStyle='#9c7a52';
-        ctx.fillRect(-capy.w*0.28, capy.h*0.45 + bob + walk*2, 18, 6);
-        ctx.fillRect( capy.w*0.02,  capy.h*0.45 + bob - walk*2, 18, 6);
-
-        // shadow ripple
-        ctx.strokeStyle='rgba(120,227,200,.25)';
-        ctx.lineWidth=2;
-        ctx.beginPath(); ctx.ellipse(0, capy.h*0.58 + bob*0.3, capy.w*0.62, 10, 0, 0, Math.PI*2); ctx.stroke();
-
-        ctx.restore();
-      }
-
-      let last = performance.now();
-      function loop(now){
-        const dt = Math.min(50, now - last); last = now;
-        const dtSec = dt / 1000;
-
-        ctx.clearRect(0,0,cssW,cssH);
-        drawGround();
-
-        // move
-        capy.x += capy.speed * capy.dir * dtSec;
-        if(capy.x > cssW-60){ capy.x = cssW-60; capy.dir = -1; }
-        if(capy.x < 60){      capy.x = 60;      capy.dir =  1; }
-
-        // draw
->>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa
+        if(capy.dir === 1 && capy.x > cssW + 50) { capy.dir = -1; } 
+        if(capy.dir === -1 && capy.x < -50) { capy.dir = 1; }     
         drawCapy(now/1000);
         requestAnimationFrame(loop);
       }
       requestAnimationFrame(loop);
-<<<<<<< HEAD
     })();
-
   </script>
 </body>
 </html>
-=======
-    }
-  </script>
-</body>
-</html>
->>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa
