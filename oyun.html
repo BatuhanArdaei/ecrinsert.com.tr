@@ -16,7 +16,7 @@
       overflow: hidden;
       background: #000;
       font-family: 'Fredoka', sans-serif;
-      touch-action: none;
+      touch-action: none; /* Tüm sayfa için kaydırmayı kapat */
     }
 
     canvas { display: block; width: 100vw; height: 100vh; }
@@ -60,11 +60,15 @@
     h1 { color: #ff6b81; font-size: 2rem; margin-bottom: 10px; }
     p { color: #777; margin-bottom: 25px; font-size: 1rem; line-height: 1.5; }
     
+    /* Butonun tıklanabilirliğini artırdık */
     .btn-play {
       background: linear-gradient(45deg, #ff9a9e, #ff6b81); color: white; border: none;
       padding: 15px 40px; font-size: 1.2rem; border-radius: 50px; cursor: pointer;
       font-family: 'Fredoka', sans-serif; font-weight: 600;
       box-shadow: 0 10px 20px rgba(255, 107, 129, 0.3); transition: transform 0.2s;
+      touch-action: manipulation; /* Dokunmatik iyileştirmesi */
+      pointer-events: auto; /* Tıklamayı garantiye al */
+      position: relative; z-index: 50;
     }
     .btn-play:active { transform: scale(0.95); }
 
@@ -89,7 +93,8 @@
     <div class="card">
       <h1 id="menu-title">Aşk Koşusu 🐾</h1>
       <p id="menu-desc">Skor arttıkça hava kararacak!<br>Hazır mısın?</p>
-      <button class="btn-play" onclick="startGame()">BAŞLA</button>
+      <!-- ID EKLENDİ: start-btn -->
+      <button id="start-btn" class="btn-play">BAŞLA</button>
       <div class="tutorial"><i class="fa-solid fa-hand-pointer"></i> Zıplamak için dokun</div>
     </div>
   </div>
@@ -102,6 +107,7 @@
     const menuTitle = document.getElementById('menu-title');
     const menuDesc = document.getElementById('menu-desc');
     const scoreDisplay = document.getElementById('score-display');
+    const startButton = document.getElementById('start-btn'); // Butonu JS'e aldık
 
     let isPlaying = false;
     let score = 0;
@@ -249,7 +255,6 @@
         grad.addColorStop(0, cTop); grad.addColorStop(1, cBot);
         ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
-        // Yıldızlar
         if (darkFactor > 0.2) {
             ctx.fillStyle = '#fff';
             stars.forEach(s => {
@@ -259,14 +264,12 @@
             ctx.globalAlpha = 1.0;
         }
 
-        // Güneş / Ay
         let sunY = 50 + (darkFactor * 30);
         ctx.fillStyle = cSun;
         if(darkFactor > 0.8) { ctx.shadowBlur = 25; ctx.shadowColor = 'rgba(255,255,255,0.8)'; }
         ctx.beginPath(); ctx.arc(W - 50, sunY, 30, 0, Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0;
 
-        // Arka Plan Hareket
         bgOffset1 -= (0.5 + darkFactor); if(bgOffset1 <= -W) bgOffset1 = 0;
         ctx.fillStyle = lerpColor('#90CAF9', '#2c3e50', darkFactor);
         for(let i=0; i<2; i++) {
@@ -297,11 +300,9 @@
         drawBackground();
         player.update(); player.draw();
 
-        // Engel Spawn
         if (frame % Math.floor(100 - score/50) === 0 || (frame % 60 === 0 && Math.random() > 0.9)) { 
             if(Math.random() > 0.4) obstacles.push(new Obstacle());
         }
-        // Kalp Spawn
         if (frame % 80 === 0) { if(Math.random() > 0.5) hearts.push(new Heart()); }
 
         for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -328,25 +329,57 @@
         requestAnimationFrame(gameLoop);
     }
 
+    // === OYUNU BAŞLATMA (ÖNEMLİ DÜZELTME) ===
     function startGame() {
+        console.log("Oyun başlıyor...");
         isPlaying = true; score = 0; gameSpeed = 6; frame = 0;
         obstacles = []; hearts = []; particles = [];
         scoreDisplay.innerText = '0';
         player.y = H - 150; player.dy = 0; player.grounded = false;
-        menuOverlay.style.opacity = '0'; setTimeout(() => menuOverlay.style.display = 'none', 300);
+        
+        menuOverlay.style.opacity = '0'; 
+        setTimeout(() => menuOverlay.style.display = 'none', 300);
+        
         gameLoop();
+    }
+
+    // Buton Dinleyicisi (Hem click hem touchstart)
+    if(startButton) {
+        // Dokunmatik olayını durdurup sadece startGame'i çalıştırıyoruz
+        startButton.addEventListener('touchstart', (e) => {
+            e.stopPropagation(); // Olayın window'a gitmesini engelle
+            e.preventDefault();  // Varsayılan dokunma efektini engelle
+            startGame();
+        }, { passive: false });
+
+        startButton.addEventListener('click', startGame);
     }
 
     function gameOver() {
         isPlaying = false;
         menuOverlay.style.display = 'flex'; setTimeout(() => menuOverlay.style.opacity = '1', 10);
-        menuTitle.innerText = "Oyun Bitti! 🥺"; menuDesc.innerText = `Skorun: ${score}\nTekrar dene sevgilim!`;
+        const title = document.getElementById('menu-title');
+        const desc = document.getElementById('menu-desc');
+        title.innerText = "Oyun Bitti! 🥺"; desc.innerText = `Skorun: ${score}\nTekrar dene sevgilim!`;
+        startButton.innerText = "TEKRAR OYNA";
     }
 
+    // === GLOBAL KONTROLLER ===
     function handleJump(e) {
-        if(e.type === 'touchstart') e.preventDefault();
-        if (!isPlaying) { if(menuOverlay.style.display === 'none') return; } else { player.jump(); }
+        // Eğer butonlara veya menüye dokunuluyorsa zıplama yapma
+        if(e.target.tagName === 'BUTTON' || e.target.closest('.nav-btn')) return;
+
+        if(e.type === 'touchstart') e.preventDefault(); // Sayfa kaymasını engelle
+        
+        if (!isPlaying) { 
+            // Oyun oynamıyorsa hiçbir şey yapma (Butonlar kendi listener'ına sahip)
+            return; 
+        } else { 
+            player.jump(); 
+        }
     }
+
+    // Global dinleyiciler
     window.addEventListener('touchstart', handleJump, {passive: false});
     window.addEventListener('mousedown', handleJump);
     window.addEventListener('keydown', (e) => { if(e.code === 'Space') handleJump(e); });
