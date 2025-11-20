@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+<<<<<<< HEAD
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Bizim Şarkılarımız 🎶</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #ff9a9e;
+      --dark: #6b4c4c;
+      --glass: rgba(255, 255, 255, 0.3);
+      --glass-solid: rgba(255, 255, 255, 0.65);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      background: radial-gradient(circle at center, #ffdde1, #ee9ca7);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--dark);
+      padding-bottom: 140px; /* Player için alt boşluk */
+    }
+
+    #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+    .container {
+      width: 90%;
+      max-width: 450px;
+      margin-top: 20px;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 25px;
+      border: 1px solid rgba(255,255,255,0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    h1 { text-align: center; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 5px; }
+    p.subtitle { text-align: center; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 20px; }
+
+    .song-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      background: var(--glass-solid);
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    
+    .song-item:hover { background: #fff; transform: scale(1.02); }
+    .song-item.active { background: #fff; border-left: 4px solid var(--primary); }
+    
+    /* Özel Şarkı için farklı stil */
+    .song-item.special-item {
+        background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255, 230, 230, 0.8));
+        border: 1px solid #fff;
+    }
+
+    .song-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 8px;
+      margin-right: 15px;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      font-size: 1.2rem;
+      color: white;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+    }
+
+    .song-info { flex: 1; }
+    .song-title { font-weight: 700; font-size: 0.95rem; display: block; }
+    .song-artist { font-size: 0.75rem; opacity: 0.8; }
+    
+    .playing-anim { display: none; height: 15px; gap: 2px; }
+    .active .playing-anim { display: flex; }
+    .bar { width: 3px; background: var(--primary); animation: equalizer 1s infinite; }
+    .bar:nth-child(2) { animation-delay: 0.2s; }
+    .bar:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes equalizer { 0%, 100% { height: 5px; } 50% { height: 15px; } }
+
+    /* === PLAYER BAR === */
+    .player-bar {
+      position: fixed;
+      bottom: 20px;
+      width: 90%;
+      max-width: 450px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      padding: 15px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      z-index: 100;
+      transform: translateY(150%);
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .player-bar.show { transform: translateY(0); }
+
+    .vinyl-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #222;
+      margin-right: 15px;
+      animation: spin 4s linear infinite;
+      animation-play-state: paused;
+      border: 2px solid var(--primary);
+      background-image: url('https://cdn-icons-png.flaticon.com/512/3659/3659738.png');
+      background-size: cover;
+    }
+    .player-bar.playing .vinyl-thumb { animation-play-state: running; }
+
+    .player-info { flex: 1; overflow: hidden; }
+    .p-title { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem;}
+    .p-artist { font-size: 0.75rem; opacity: 0.7; }
+
+    .controls { display: flex; align-items: center; gap: 15px; font-size: 1.4rem; color: var(--primary); }
+    .play-btn { cursor: pointer; transition: 0.2s; }
+    .play-btn:active { transform: scale(0.9); }
+
+    .progress-container {
+      position: absolute; top: 0; left: 20px; right: 20px; height: 4px;
+      background: rgba(0,0,0,0.05); border-radius: 10px; cursor: pointer;
+    }
+    .progress-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .back-menu {
+        text-align: center; margin-top: 20px; display: block; text-decoration: none;
+        color: white; font-weight: bold; background: rgba(255,255,255,0.2);
+        padding: 12px; border-radius: 10px; transition: 0.3s;
+    }
+    .back-menu:hover { background: rgba(255,255,255,0.4); }
+  </style>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="container">
+    <h1>Sevgilim için Şarkılar 🎧</h1>
+    <p class="subtitle">Her biri seni hatırlatıyor...</p>
+
+    <div class="song-list">
+      
+      <!-- ÖZEL ŞARKI -->
+      <div class="song-item special-item" onclick="playTrack(0)">
+        <div class="song-img" style="background: linear-gradient(45deg, #ff758c, #ff7eb3);"><i class="fa-solid fa-heart"></i></div>
+        <div class="song-info">
+          <span class="song-title">ÖZEL ŞARKI</span>
+          <span class="song-artist">Bizim Şarkımız</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #1 -->
+      <div class="song-item" onclick="playTrack(1)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Derin Aşk</span>
+          <span class="song-artist">Şehinşah</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #2 -->
+      <div class="song-item" onclick="playTrack(2)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">ROMANTİK</span>
+          <span class="song-artist">Motive</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #3 -->
+      <div class="song-item" onclick="playTrack(3)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Güller İçinden</span>
+          <span class="song-artist">MFÖ</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #4 -->
+      <div class="song-item" onclick="playTrack(4)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Ta Uzak Yollardan</span>
+          <span class="song-artist">Nilüfer</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #5 -->
+      <div class="song-item" onclick="playTrack(5)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Neredeyiz</span>
+          <span class="song-artist">MFÖ</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #6 -->
+      <div class="song-item" onclick="playTrack(6)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Ben Varım</span>
+          <span class="song-artist">Ayten Alpman</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #7 -->
+      <div class="song-item" onclick="playTrack(7)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Sevdim Seni Bir Kere</span>
+          <span class="song-artist">Teoman</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #8 -->
+      <div class="song-item" onclick="playTrack(8)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Elleri Ellerime</span>
+          <span class="song-artist">Duman</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #9 -->
+      <div class="song-item" onclick="playTrack(9)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Seni Dert Etmeler</span>
+          <span class="song-artist">Madrigal</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <!-- ŞARKI #10 -->
+      <div class="song-item" onclick="playTrack(10)">
+        <div class="song-img"><i class="fa-solid fa-music"></i></div>
+        <div class="song-info">
+          <span class="song-title">Muhtemel Aşk</span>
+          <span class="song-artist">yirmi7, Birol Namoğlu</span>
+        </div>
+        <div class="playing-anim"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+
+      <a href="../index.html" class="back-menu">
+        <i class="fa-solid fa-arrow-left"></i> Menüye Dön
+      </a>
+    </div>
+  </div>
+
+  <audio id="audio-player"></audio>
+
+  <!-- ALT OYNATICI (STICKY) -->
+  <div class="player-bar" id="player-bar">
+    <div class="progress-container" id="progress-container">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="vinyl-thumb"></div>
+    <div class="player-info">
+      <div class="p-title" id="p-title">Müzik Seç</div>
+      <div class="p-artist" id="p-artist">...</div>
+    </div>
+    <div class="controls">
+      <i class="fa-solid fa-backward-step" onclick="prevTrack()"></i>
+      <div class="play-btn" onclick="togglePlay()">
+        <i class="fa-solid fa-circle-play" id="play-icon" style="font-size: 2rem;"></i>
+      </div>
+      <i class="fa-solid fa-forward-step" onclick="nextTrack()"></i>
+    </div>
+  </div>
+
+  <script>
+    /* 
+      DOSYA YOLU AYARLARI:
+      HTML dosyasının olduğu yerde "muzikler" diye bir klasör aç.
+      İçine sarki1.mp3, sarki2.mp3 şeklinde dosyaları at.
+    */
+    const trackList = [
+      { title: "ÖZEL ŞARKI", artist: "Bizim Şarkımız", src: "muzikler/ozel.mp3" },
+      { title: "Şarkı #1", artist: "Sanatçı", src: "muzikler/sarki1.mp3" },
+      { title: "Şarkı #2", artist: "Sanatçı", src: "muzikler/sarki2.mp3" },
+      { title: "Şarkı #3", artist: "Sanatçı", src: "muzikler/sarki3.mp3" },
+      { title: "Şarkı #4", artist: "Sanatçı", src: "muzikler/sarki4.mp3" },
+      { title: "Şarkı #5", artist: "Sanatçı", src: "muzikler/sarki5.mp3" },
+      { title: "Şarkı #6", artist: "Sanatçı", src: "muzikler/sarki6.mp3" },
+      { title: "Şarkı #7", artist: "Sanatçı", src: "muzikler/sarki7.mp3" },
+      { title: "Şarkı #8", artist: "Sanatçı", src: "muzikler/sarki8.mp3" },
+      { title: "Şarkı #9", artist: "Sanatçı", src: "muzikler/sarki9.mp3" },
+      { title: "Şarkı #10", artist: "Sanatçı", src: "muzikler/sarki10.mp3" }
+    ];
+
+    const audio = document.getElementById('audio-player');
+    const playerBar = document.getElementById('player-bar');
+    const pTitle = document.getElementById('p-title');
+    const pArtist = document.getElementById('p-artist');
+    const playIcon = document.getElementById('play-icon');
+    const progressFill = document.getElementById('progress-fill');
+    const progressContainer = document.getElementById('progress-container');
+    const songItems = document.querySelectorAll('.song-item');
+
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    function loadTrack(index) {
+      const track = trackList[index];
+      audio.src = track.src;
+      pTitle.innerText = track.title;
+      pArtist.innerText = track.artist;
+      
+      songItems.forEach((item, i) => {
+        if(i === index) item.classList.add('active');
+        else item.classList.remove('active');
+      });
+      playerBar.classList.add('show');
+    }
+
+    function playTrack(index) {
+      if (index === currentIndex && audio.src && !audio.paused) {
+        togglePlay();
+        return;
+      }
+      currentIndex = index;
+      loadTrack(currentIndex);
+      audio.play();
+      isPlaying = true;
+      updatePlayIcon();
+      playerBar.classList.add('playing');
+    }
+
+    function togglePlay() {
+      if (!audio.src) return;
+      if (audio.paused) {
+        audio.play();
+        isPlaying = true;
+        playerBar.classList.add('playing');
+      } else {
+        audio.pause();
+        isPlaying = false;
+        playerBar.classList.remove('playing');
+      }
+      updatePlayIcon();
+    }
+
+    function updatePlayIcon() {
+      if (isPlaying) {
+        playIcon.classList.remove('fa-circle-play');
+        playIcon.classList.add('fa-circle-pause');
+      } else {
+        playIcon.classList.remove('fa-circle-pause');
+        playIcon.classList.add('fa-circle-play');
+      }
+    }
+
+    function nextTrack() {
+      currentIndex = (currentIndex + 1) % trackList.length;
+      playTrack(currentIndex);
+    }
+
+    function prevTrack() {
+      currentIndex = (currentIndex - 1 + trackList.length) % trackList.length;
+      playTrack(currentIndex);
+    }
+
+    audio.addEventListener('timeupdate', (e) => {
+      if(audio.duration) {
+        const progressPercent = (audio.currentTime / audio.duration) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+      }
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+      const width = progressContainer.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audio.duration;
+      if(duration) audio.currentTime = (clickX / width) * duration;
+    });
+
+    audio.addEventListener('ended', nextTrack);
+
+    /* ARKA PLAN EFEKTİ */
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+    window.addEventListener('resize',resize); resize();
+    class P{constructor(){this.x=Math.random()*canvas.width;this.y=canvas.height+Math.random()*50;this.s=Math.random()*2+1;this.v=Math.random()*0.5+0.2;}up(){this.y-=this.v;if(this.y<-10)this.y=canvas.height+10;}dr(){ctx.fillStyle='rgba(255,255,255,0.5)';ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();}}
+    for(let i=0;i<40;i++) particles.push(new P());
+    function anim(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.up();p.dr()});requestAnimationFrame(anim);}
+    anim();
+  </script>
+</body>
+</html>
+=======
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Müzik Öneri</title>
+  <link rel="stylesheet" href="muzik.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Sevgilim için Romantik Şarkılar</h1>
+    <div class="songs">
+        <a href="https://open.spotify.com/intl-tr/track/1v0KWJu3cWyDklfnlzPlig?si=ed0d400f9c904649" target="_blank" class="song-button">ÖZEL ŞARKI</a>
+      <a href="https://open.spotify.com/intl-tr/track/05GP2lRCfMoAtWT8E3g1wq?si=7ba95c6a39f54081" target="_blank" class="song-button">Şarkı #1</a>
+      <a href="https://open.spotify.com/intl-tr/track/3730z7N28rvWW4PpSXR7PY?si=18366667f103489d" target="_blank" class="song-button">Şarkı #2</a>
+      <a href="https://open.spotify.com/intl-tr/track/5iQzKryLiRfCbid0mP75pb?si=b8599bf30592444e" target="_blank" class="song-button">Şarkı #3</a>
+      <a href="https://open.spotify.com/intl-tr/track/4Q8RkSigphYoi9lFm5nFBW?si=d77291994cf04d12" target="_blank" class="song-button">Şarkı #4</a>
+      <a href="https://open.spotify.com/intl-tr/track/7374TO8IUbG8UrcDjlD9t1?si=91a2f121c6d44289" target="_blank" class="song-button">Şarkı #5</a>
+      <a href="https://open.spotify.com/intl-tr/track/4JKFab0j6szsmQFB5qQzx0?si=15066e12d9b14136" target="_blank" class="song-button">Şarkı #6</a>
+      <a href="https://open.spotify.com/intl-tr/track/73Dq5bAe6PvhKstTc0sVkp?si=a713dcd286ca4307" target="_blank" class="song-button">Şarkı #7</a>
+      <a href="https://open.spotify.com/intl-tr/track/0o16NrUwcH3U0fEEPD79VB?si=17b84822b17a429d" target="_blank" class="song-button">Şarkı #8</a>
+      <a href="https://open.spotify.com/intl-tr/track/2Aq4sw2LKalsQ7m4pzLZ88?si=9ae6cd73bacb43f4" target="_blank" class="song-button">Şarkı #9</a>
+      <a href="https://open.spotify.com/intl-tr/track/6kL1P502vhZv7PRJ9e0pR6?si=c1db7f4c43e54a52" target="_blank" class="song-button">Şarkı #10</a>
+      <a href="../index.html" class="song-button">MENÜYE GERİ DÖN</a>
+    </div>
+    </div>
+  </div>
+</body>
+</html>
+<footer style="
+  margin-top: 40px;
+  padding: 12px 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.7);
+  user-select: none;
+  font-weight: 500;
+  font-family: 'Segoe UI', sans-serif;
+">
+  BatuhanArda tarafından Dünyalar Güzeli Sevgilisi Ecrin'e hazırlanmıştır 💖
+</footer>
+>>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa

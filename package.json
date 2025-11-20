@@ -1,0 +1,24 @@
+{
+  "name": "ecrinsert.com.tr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "album.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/batuhanardaei/ecrinsert.com.tr.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/batuhanardaei/ecrinsert.com.tr/issues"
+  },
+  "homepage": "https://github.com/batuhanardaei/ecrinsert.com.tr#readme",
+  "dependencies": {
+    "@vercel/blob": "^1.1.1"
+  }
+}

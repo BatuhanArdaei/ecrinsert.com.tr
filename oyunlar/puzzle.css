@@ -1,0 +1,24 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+#puzzle-container {
+  width: 480px;
+  height: 480px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.piece {
+  width: 160px;
+  height: 160px;
+  background-size: 480px 480px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+}

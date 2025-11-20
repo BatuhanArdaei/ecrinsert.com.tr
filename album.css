@@ -1,0 +1,53 @@
+body, html {
+  margin: 0; padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #fed6e3, #a8edea);
+  color: #333; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+}
+header {
+  width: 100%; padding: 15px 20px;
+  background: rgba(255,255,255,.9);
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+  display: flex; justify-content: space-between; align-items: center;
+  user-select: none;
+}
+header h1 { margin: 0; font-size: 1.8rem; color: #5a5a5a; }
+header button {
+  cursor: pointer; padding: 8px 16px; font-size: 1rem; border: none;
+  border-radius: 12px; background: #ff92a1; color: #fff; transition: .3s;
+}
+header button:hover { background: #ff6576; }
+
+#uploadBtn {
+  background: linear-gradient(45deg, #a76df9, #674ba2);
+  border: none; border-radius: 50px; padding: 16px 40px;
+  font-size: 1.4rem; font-weight: 700; color: #fff; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(167,109,249,.7); transition: .3s;
+  user-select: none;
+}
+#uploadBtn:hover {
+  background: linear-gradient(45deg, #c29aff, #7a55f3);
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(194,154,255,.9);
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px; width: 90vw; max-width: 1100px;
+}
+.gallery-grid .item {
+  background: rgba(255,255,255,.85);
+  border-radius: 18px; padding: 10px;
+  box-shadow: 0 8px 25px rgba(255,146,161,.3);
+  text-align: center; overflow: hidden;
+}
+.gallery-grid img, .gallery-grid video {
+  width: 100%; border-radius: 12px; object-fit: cover;
+}
+.gallery-grid video { max-height: 320px; }
+
+@media (max-width: 600px) {
+  #uploadBtn { font-size: 1.2rem; padding: 12px 30px; width: 90%; }
+}

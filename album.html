@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ortak Albüm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/album.css">
+</head>
+<body>
+  <header>
+    <h1>📷 Ortak Albüm</h1>
+    <button id="refreshBtn">Yenile 🔄</button>
+  </header>
+
+  <main style="display:flex;flex-direction:column;align-items:center;gap:20px;margin:30px 0 60px;">
+    <input id="fileInput" type="file" multiple accept="image/*,video/*" hidden>
+    <button id="uploadBtn">Fotoğraf / Video Yükle</button>
+
+    <div id="gallery" class="gallery-grid"></div>
+  </main>
+
+  <script src="/album.js" defer></script>
+</body>
+</html>

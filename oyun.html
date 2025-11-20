@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<<<<<<< HEAD
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Kapibara Aşk Koşusu 💖</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Fredoka', sans-serif;
+      touch-action: none;
+    }
+
+    canvas { display: block; width: 100vw; height: 100vh; }
+
+    #ui-layer {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; display: flex; flex-direction: column; z-index: 10;
+    }
+
+    .nav-btn {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
+      padding: 10px 18px; border-radius: 30px; text-decoration: none;
+      color: #555; font-weight: 600; font-size: 0.9rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); pointer-events: auto; z-index: 20;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .score-box {
+      position: absolute; top: 20px; right: 20px;
+      background: rgba(255, 107, 129, 0.9); color: white;
+      padding: 8px 20px; border-radius: 30px; font-size: 1.2rem; font-weight: 600;
+      box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    #menu-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 30; pointer-events: auto; transition: opacity 0.3s;
+    }
+
+    .card {
+      background: white; padding: 30px 40px; border-radius: 25px;
+      text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 90%; width: 350px;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    h1 { color: #ff6b81; font-size: 2rem; margin-bottom: 10px; }
+    p { color: #777; margin-bottom: 25px; font-size: 1rem; line-height: 1.5; }
+    
+    .btn-play {
+      background: linear-gradient(45deg, #ff9a9e, #ff6b81); color: white; border: none;
+      padding: 15px 40px; font-size: 1.2rem; border-radius: 50px; cursor: pointer;
+      font-family: 'Fredoka', sans-serif; font-weight: 600;
+      box-shadow: 0 10px 20px rgba(255, 107, 129, 0.3); transition: transform 0.2s;
+    }
+    .btn-play:active { transform: scale(0.95); }
+
+    .tutorial {
+      margin-top: 20px; font-size: 0.85rem; color: #aaa;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="../index.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Menü</a>
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="ui-layer">
+    <div class="score-box">
+      <i class="fa-solid fa-heart"></i> <span id="score-display">0</span>
+    </div>
+  </div>
+
+  <div id="menu-overlay">
+    <div class="card">
+      <h1 id="menu-title">Aşk Koşusu 🐾</h1>
+      <p id="menu-desc">Başarılar Dilerim<br>Güzel Sevgilim.🌙</p>
+      <button class="btn-play" onclick="startGame()">BAŞLA</button>
+      <div class="tutorial"><i class="fa-solid fa-hand-pointer"></i> Zıplamak için dokun</div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const menuOverlay = document.getElementById('menu-overlay');
+    const menuTitle = document.getElementById('menu-title');
+    const menuDesc = document.getElementById('menu-desc');
+    const scoreDisplay = document.getElementById('score-display');
+
+    let isPlaying = false;
+    let score = 0;
+    let gameSpeed = 6;
+    let frame = 0;
+    let W, H;
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // === RENK GEÇİŞ FONKSİYONU ===
+    function lerpColor(a, b, amount) {
+        const ah = parseInt(a.replace(/#/g, ''), 16),
+              ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+              bh = parseInt(b.replace(/#/g, ''), 16),
+              br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+              rr = ar + amount * (br - ar),
+              rg = ag + amount * (bg - ag),
+              rb = ab + amount * (bb - ab);
+        return '#' + ((1 << 24) + (rr << 16) + (rg << 8) + rb | 0).toString(16).slice(1);
+    }
+
+    // === OYUNCU ===
+    const player = {
+      x: 50, y: 0, w: 60, h: 40, dy: 0, jumpForce: 16, gravity: 0.55,
+      grounded: false, jumpCount: 0, maxJumps: 2, color: '#c59a6b',
+      draw: function() {
+        ctx.save(); ctx.translate(this.x, this.y);
+        let bob = this.grounded ? Math.sin(frame * 0.2) * 2 : 0;
+        if (!this.grounded) ctx.rotate(-0.1);
+
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.roundRect(0, 0 + bob, this.w, this.h, 15); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(this.w - 25, -15 + bob, 40, 40, 14); ctx.fill();
+        ctx.fillStyle = '#3e2723'; ctx.beginPath(); ctx.arc(this.w + 5, -5 + bob, 4, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(this.w + 6, -7 + bob, 1.5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.ellipse(this.w - 10, -15 + bob, 6, 8, 0.5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#3e2723'; ctx.beginPath(); ctx.roundRect(this.w + 10, 2 + bob, 8, 6, 3); ctx.fill();
+        ctx.fillStyle = 'rgba(255, 105, 180, 0.4)'; ctx.beginPath(); ctx.arc(this.w, 5 + bob, 6, 0, Math.PI*2); ctx.fill();
+
+        ctx.fillStyle = '#8d6e63';
+        if (this.grounded) {
+            let legSwing = Math.sin(frame * 0.3) * 8;
+            ctx.beginPath(); ctx.roundRect(10 + legSwing, this.h + bob - 5, 10, 12, 4); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(this.w - 20 - legSwing, this.h + bob - 5, 10, 12, 4); ctx.fill();
+        } else {
+            ctx.beginPath(); ctx.roundRect(5, this.h - 5, 10, 10, 4); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(this.w - 25, this.h - 8, 10, 10, 4); ctx.fill();
+        }
+        ctx.restore();
+      },
+      update: function() {
+        this.dy += this.gravity; this.y += this.dy;
+        let groundY = H - 100;
+        if (this.y + this.h > groundY) {
+            this.y = groundY - this.h; this.dy = 0; this.grounded = true; this.jumpCount = 0;
+        } else { this.grounded = false; }
+      },
+      jump: function() {
+        if (this.jumpCount < this.maxJumps) {
+            this.dy = -this.jumpForce; this.jumpCount++; this.grounded = false;
+            createParticles(this.x + this.w/2, this.y + this.h, 5, '#fff');
+        }
+      }
+    };
+
+    // === NESNELER ===
+    let obstacles = [];
+    let hearts = [];
+    let particles = [];
+    let stars = [];
+
+    for(let i=0; i<60; i++) {
+        stars.push({ x: Math.random()*window.innerWidth, y: Math.random()*(window.innerHeight/1.5), size: Math.random()*2.5, blink: Math.random() });
+    }
+
+    class Obstacle {
+        constructor() {
+            this.w = 40; this.h = 50 + Math.random() * 30;
+            this.x = W; this.y = (H - 100) - this.h; this.color = '#66bb6a';
+        }
+        draw() {
+            this.x -= gameSpeed;
+            ctx.fillStyle = this.color; ctx.beginPath(); ctx.roundRect(this.x, this.y, this.w, this.h, 10); ctx.fill();
+            ctx.strokeStyle = '#2e7d32'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(this.x + this.w/2, this.y + 5); ctx.lineTo(this.x + this.w/2, this.y + this.h - 5); ctx.stroke();
+            ctx.fillStyle = '#ffeb3b'; ctx.beginPath(); ctx.arc(this.x + Math.random()*this.w, this.y + Math.random()*this.h, 3, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    class Heart {
+        constructor() {
+            this.size = 30; this.x = W; this.y = (H - 100) - 35 - Math.random() * 55; this.collected = false;
+        }
+        draw() {
+            if(this.collected) return;
+            this.x -= gameSpeed;
+            let pulse = Math.sin(frame * 0.1) * 3;
+            ctx.fillStyle = '#ff4757';
+            let x = this.x, y = this.y, size = this.size + pulse;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.bezierCurveTo(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
+            ctx.bezierCurveTo(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
+            ctx.fill();
+        }
+    }
+
+    function createParticles(x, y, count, color) {
+        for(let i=0; i<count; i++) particles.push({ x: x, y: y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 1.0, color: color });
+    }
+    function updateParticles() {
+        for(let i=particles.length-1; i>=0; i--) {
+            let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.03;
+            ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1.0;
+            if(p.life <= 0) particles.splice(i, 1);
+        }
+    }
+
+    // === GÜN DÖNGÜSÜ & ÇİZİM ===
+    let bgOffset1 = 0, bgOffset2 = 0;
+    const DayColors = { top: '#87CEEB', bot: '#E0F7FA', sun: '#FFD54F', hill: '#A5D6A7', ground: '#6D4C41' };
+    const NightColors = { top: '#0d1b2a', bot: '#1b263b', sun: '#ffffff', hill: '#14213d', ground: '#221612' };
+
+    function drawBackground() {
+        // EŞİKLERİ DÜŞÜRDÜM: 10 Puanda başlar, 100 Puanda tam gece olur.
+        let darkFactor = 0;
+        if (score > 50) {
+            darkFactor = (score - 50) / 600; // 90 puanlık bir geçiş süresi
+            if(darkFactor > 10) darkFactor = 1;
+        }
+
+        let cTop = lerpColor(DayColors.top, NightColors.top, darkFactor);
+        let cBot = lerpColor(DayColors.bot, NightColors.bot, darkFactor);
+        let cSun = lerpColor(DayColors.sun, NightColors.sun, darkFactor);
+        let cHill = lerpColor(DayColors.hill, NightColors.hill, darkFactor);
+        let cGround = lerpColor(DayColors.ground, NightColors.ground, darkFactor);
+
+        let grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, cTop); grad.addColorStop(1, cBot);
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+
+        // Yıldızlar
+        if (darkFactor > 0.2) {
+            ctx.fillStyle = '#fff';
+            stars.forEach(s => {
+                ctx.globalAlpha = darkFactor * (0.4 + Math.sin(frame * 0.1 + s.blink) * 0.6);
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+        }
+
+        // Güneş / Ay
+        let sunY = 50 + (darkFactor * 30);
+        ctx.fillStyle = cSun;
+        if(darkFactor > 0.8) { ctx.shadowBlur = 25; ctx.shadowColor = 'rgba(255,255,255,0.8)'; }
+        ctx.beginPath(); ctx.arc(W - 50, sunY, 30, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Arka Plan Hareket
+        bgOffset1 -= (0.5 + darkFactor); if(bgOffset1 <= -W) bgOffset1 = 0;
+        ctx.fillStyle = lerpColor('#90CAF9', '#2c3e50', darkFactor);
+        for(let i=0; i<2; i++) {
+            let startX = bgOffset1 + (i * W);
+            ctx.beginPath(); ctx.moveTo(startX, H - 100); ctx.lineTo(startX + W/2, H - 300); ctx.lineTo(startX + W, H - 100); ctx.fill();
+        }
+
+        bgOffset2 -= (1.5 + darkFactor); if(bgOffset2 <= -W) bgOffset2 = 0;
+        ctx.fillStyle = cHill;
+        for(let i=0; i<2; i++) {
+            let startX = bgOffset2 + (i * W);
+            ctx.beginPath(); ctx.ellipse(startX + W/2, H - 80, W/1.5, 100, 0, Math.PI, 0); ctx.fill();
+        }
+
+        ctx.fillStyle = cGround; ctx.fillRect(0, H - 100, W, 100);
+        ctx.fillStyle = lerpColor('#8D6E63', '#3b2721', darkFactor); ctx.fillRect(0, H - 100, W, 10);
+    }
+
+    function gameLoop() {
+        if (!isPlaying) return;
+        ctx.clearRect(0, 0, W, H);
+        frame++;
+
+        let targetSpeed = 6 + (score / 50); // Hızlanmayı da biraz artırdım
+        if(targetSpeed > 18) targetSpeed = 18;
+        gameSpeed += (targetSpeed - gameSpeed) * 0.01;
+
+        drawBackground();
+        player.update(); player.draw();
+
+        // Engel Spawn
+        if (frame % Math.floor(100 - score/50) === 0 || (frame % 60 === 0 && Math.random() > 0.9)) { 
+            if(Math.random() > 0.4) obstacles.push(new Obstacle());
+        }
+        // Kalp Spawn
+        if (frame % 80 === 0) { if(Math.random() > 0.5) hearts.push(new Heart()); }
+
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+            let obs = obstacles[i]; obs.draw();
+            if (player.x < obs.x + obs.w - 10 && player.x + player.w > obs.x + 10 &&
+                player.y < obs.y + obs.h - 10 && player.y + player.h > obs.y + 10) {
+                gameOver();
+            }
+            if (obs.x + obs.w < 0) obstacles.splice(i, 1);
+        }
+
+        for (let i = hearts.length - 1; i >= 0; i--) {
+            let heart = hearts[i]; heart.draw();
+            let dx = (player.x + player.w/2) - heart.x;
+            let dy = (player.y + player.h/2) - heart.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 80) { 
+                hearts.splice(i, 1); score += 10; scoreDisplay.innerText = score;
+                createParticles(heart.x, heart.y, 10, '#ff4757');
+            }
+            if (heart.x < -50) hearts.splice(i, 1);
+        }
+        updateParticles();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+        isPlaying = true; score = 0; gameSpeed = 6; frame = 0;
+        obstacles = []; hearts = []; particles = [];
+        scoreDisplay.innerText = '0';
+        player.y = H - 150; player.dy = 0; player.grounded = false;
+        menuOverlay.style.opacity = '0'; setTimeout(() => menuOverlay.style.display = 'none', 300);
+        gameLoop();
+    }
+
+    function gameOver() {
+        isPlaying = false;
+        menuOverlay.style.display = 'flex'; setTimeout(() => menuOverlay.style.opacity = '1', 10);
+        menuTitle.innerText = "Oyun Bitti! 🥺"; menuDesc.innerText = `Skorun: ${score}\nTekrar dene sevgilim!`;
+    }
+
+    function handleJump(e) {
+        if(e.type === 'touchstart') e.preventDefault();
+        if (!isPlaying) { if(menuOverlay.style.display === 'none') return; } else { player.jump(); }
+    }
+    window.addEventListener('touchstart', handleJump, {passive: false});
+    window.addEventListener('mousedown', handleJump);
+    window.addEventListener('keydown', (e) => { if(e.code === 'Space') handleJump(e); });
+
+    resize(); drawBackground(); player.y = H - 100 - player.h; player.draw();
+  </script>
+</body>
+</html>
+=======
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Capybara Cozy Springs</title>
+  <style>
+    /* ==== Pastel menu theme + mobile controls ==== */
+    :root{
+      --bg1:#f7d9e6; --bg2:#bdeaea;
+      --panel:#ffffffE8; --text:#333;
+      --btn1:#a76df9; --btn2:#674ba2;
+      --btn1h:#c29aff; --btn2h:#7a55f3;
+      --accent:#78e3c8;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(180deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      display:flex; flex-direction:column; align-items:center;
+    }
+
+    /* Header */
+    header{
+      width:100%; padding:15px 20px; position:sticky; top:0; z-index:10;
+      background:rgba(255,255,255,.9);
+      box-shadow:0 2px 8px rgba(0,0,0,.1);
+      display:flex; align-items:center; justify-content:space-between;
+      user-select:none;
+    }
+    header h1{margin:0; font-size:1.4rem; color:#5a5a5a; letter-spacing:.3px}
+    .menu-btn{
+      background: linear-gradient(45deg, var(--btn1), var(--btn2));
+      color:#fff; border:none; border-radius:12px;
+      padding:10px 16px; font-weight:800; cursor:pointer;
+      box-shadow:0 8px 20px rgba(167,109,249,.4); transition:.25s;
+    }
+    .menu-btn:hover{background: linear-gradient(45deg, var(--btn1h), var(--btn2h))}
+
+    /* Layout */
+    .wrap{width:min(92vw,960px); margin:18px auto 48px; display:grid; gap:12px}
+    .hud{display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center}
+    .badge{
+      background:rgba(255,255,255,.85);
+      border-radius:14px; padding:10px 14px; font-weight:800;
+      box-shadow:0 8px 25px rgba(0,0,0,.15);
+    }
+    .btn{
+      background: linear-gradient(45deg, var(--btn1), var(--btn2));
+      border:none; border-radius:50px; padding:12px 22px;
+      color:#fff; font-weight:800; cursor:pointer;
+      box-shadow:0 8px 20px rgba(167,109,249,.5); transition:.25s;
+      user-select:none;
+    }
+    .btn:hover{transform:translateY(-1px) scale(1.02); background: linear-gradient(45deg, var(--btn1h), var(--btn2h))}
+    @media (max-width:720px){ .hud{grid-template-columns:1fr 1fr} }
+
+    /* Canvas */
+    canvas{
+      width:100%; height:auto; border-radius:22px;
+      background: linear-gradient(180deg, #0b1320, #09101a 55%, #061018);
+      border:1px solid rgba(0,0,0,.06);
+      box-shadow:0 16px 50px rgba(0,0,0,.35);
+      image-rendering:pixelated;
+    }
+
+    /* Overlays */
+    .overlay{
+      position:fixed; inset:0; display:grid; place-items:center;
+      background: radial-gradient(1100px 760px at 50% -10%, rgba(255,255,255,.45), rgba(255,255,255,.75) 60%);
+      backdrop-filter: blur(6px);
+      pointer-events:none; opacity:0; transition:opacity .25s ease;
+    }
+    .overlay.show{opacity:1; pointer-events:auto}
+    .panel{
+      width:min(92vw,640px); background:var(--panel); color:var(--text);
+      border-radius:20px; padding:26px; text-align:center;
+      box-shadow:0 20px 60px rgba(0,0,0,.15);
+    }
+    .title{margin:0 0 8px; font-size:clamp(22px,4vw,34px); font-weight:900; color:#674ba2}
+    .subtitle{opacity:.85; margin:0 0 16px}
+    .kbd{font-family:ui-monospace, Menlo, Consolas, monospace; background:#f0f2ff; border:1px solid #d9d7ff; padding:2px 6px; border-radius:6px; color:#4a4a6a}
+
+    /* Mobile big arrows */
+    .mobile-arrows{
+      position:fixed; inset:auto 0 14px 0; width:100%;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:0 14px; pointer-events:none;
+    }
+    .arrow{
+      pointer-events:auto; width:100px; height:100px; border-radius:18px;
+      background:rgba(255,255,255,.35);
+      border:2px solid rgba(0,0,0,.15);
+      backdrop-filter: blur(8px);
+      display:grid; place-items:center; cursor:pointer; touch-action:none;
+      box-shadow:0 8px 24px rgba(0,0,0,.2);
+      user-select:none;
+    }
+    .arrow svg{width:64px; height:64px; opacity:.9}
+    .arrow:active{transform:scale(.96)}
+    @media (min-width:721px){ .mobile-arrows{display:none} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Capybara Cozy Springs</h1>
+    <button class="menu-btn" id="menuBtn">Ana Menü</button>
+  </header>
+
+  <div class="wrap">
+    <div class="hud">
+      <div class="badge" id="score">Skor: 0</div>
+      <button class="btn" id="pauseBtn">Duraklat</button>
+      <button class="btn" id="restartBtn">Yeniden</button>
+    </div>
+
+    <canvas id="game" width="960" height="540" aria-label="Capybara Cozy Springs"></canvas>
+  </div>
+
+  <!-- Start / Game Over -->
+  <div class="overlay show" id="startOverlay">
+    <div class="panel">
+      <h1 class="title">Capybara Cozy Springs</h1>
+      <p class="subtitle">Capybara kaplicada portakal toplar, sivrisineklerden kacar. Skor sadece portakal toplayinca artar.</p>
+      <p>
+        <span class="kbd">A</span>/<span class="kbd">←</span> Sola ·
+        <span class="kbd">D</span>/<span class="kbd">→</span> Saga ·
+        <span class="kbd">Space</span> Duraklat/Devam
+      </p>
+      <button class="btn" id="startBtn">Basla</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="gameOverOverlay">
+    <div class="panel">
+      <h2 class="title">Oyun Bitti</h2>
+      <p class="subtitle" id="finalScore">Skor: 0</p>
+      <button class="btn" id="againBtn">Tekrar Oyna</button>
+    </div>
+  </div>
+
+  <!-- Mobile big left/right arrows -->
+  <div class="mobile-arrows" aria-hidden="false">
+    <button class="arrow" id="leftArrow" aria-label="Sola">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#d33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button class="arrow" id="rightArrow" aria-label="Saga">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#d33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // ===== Config =====
+    const HOME_URL = "/index.html"; // change if your PIN page path differs
+
+    // ===== Game bootstrap =====
+    const cv = document.getElementById('game');
+    const ctx = cv.getContext('2d');
+
+    const scoreEl = document.getElementById('score');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    const startOv = document.getElementById('startOverlay');
+    const overOv  = document.getElementById('gameOverOverlay');
+    const finalScore = document.getElementById('finalScore');
+
+    const startBtn = document.getElementById('startBtn');
+    const againBtn = document.getElementById('againBtn');
+    const menuBtn  = document.getElementById('menuBtn');
+
+    const leftArrow  = document.getElementById('leftArrow');
+    const rightArrow = document.getElementById('rightArrow');
+
+    // State
+    const state = {
+      running:false, paused:false,
+      timeMs:0,                 // time only for difficulty/spawn
+      score:0, high:0, collected:0,
+      lastSpawn:0, spawnEvery:700,
+      speedScale:1
+    };
+
+    // Player
+    const capy = { x: cv.width*0.5, y: cv.height-90, w: 90, h:54, vx:0, speed:6, alive:true };
+
+    // Entities
+    const oranges=[], bugs=[], bubbles=[], hearts=[];
+
+    // Input map
+    const keys = new Set();
+    function onKey(e,down){
+      const k = e.key.toLowerCase();
+      if(['a','arrowleft'].includes(k)) down?keys.add('left'):keys.delete('left');
+      if(['d','arrowright'].includes(k)) down?keys.add('right'):keys.delete('right');
+      if(k===' '||k==='spacebar'){ if(down) togglePause(); }
+    }
+    addEventListener('keydown', e=>onKey(e,true));
+    addEventListener('keyup',   e=>onKey(e,false));
+
+    // Mobile hold helpers
+    function hold(el, keyName){
+      let holding = false;
+      const start = (ev)=>{ ev.preventDefault(); if(holding) return; holding=true; keys.add(keyName); };
+      const end   = (ev)=>{ ev.preventDefault(); holding=false; keys.delete(keyName); };
+      el.addEventListener('touchstart', start, {passive:false});
+      el.addEventListener('touchend',   end,   {passive:false});
+      el.addEventListener('touchcancel',end,   {passive:false});
+      el.addEventListener('mousedown',  start);
+      addEventListener('mouseup',       end);
+      el.addEventListener('mouseleave', end);
+    }
+    hold(leftArrow, 'left');
+    hold(rightArrow, 'right');
+
+    // Buttons
+    pauseBtn.addEventListener('click', togglePause);
+    restartBtn.addEventListener('click', hardRestart);
+    startBtn.addEventListener('click', startGame);
+    againBtn.addEventListener('click', hardRestart);
+    menuBtn.addEventListener('click', ()=>{ window.location.href = HOME_URL; });
+
+    function startGame(){
+      startOv.classList.remove('show');
+      reset();
+      state.running = true;
+      state.paused  = false;
+      lastT = performance.now();
+      requestAnimationFrame(loop);
+    }
+    function hardRestart(){
+      overOv.classList.remove('show');
+      startGame();
+    }
+    function reset(){
+      oranges.length = bugs.length = bubbles.length = hearts.length = 0;
+      capy.x = cv.width*0.5; capy.vx=0; capy.alive=true;
+
+      state.timeMs = 0;               // only for difficulty
+      state.score  = 0;               // score from oranges only
+      state.collected = 0;
+      state.lastSpawn = 0;
+      state.speedScale = 1;
+
+      for(let i=0;i<40;i++){
+        bubbles.push({x:Math.random()*cv.width, y:Math.random()*cv.height, r:1+Math.random()*3, vy:.2+.6*Math.random()});
+      }
+      updateScoreLabel();
+    }
+    function togglePause(){
+      if(!state.running) return;
+      state.paused = !state.paused;
+      pauseBtn.textContent = state.paused ? 'Devam' : 'Duraklat';
+    }
+
+    // Spawns
+    function spawnOrange(){
+      const r = 10 + Math.random()*14;
+      const x = Math.random()*(cv.width-2*r) + r;
+      const y = -r - 10;
+      const vy = 1.2 + Math.random()*1.4 * state.speedScale;
+      oranges.push({x,y,r,vy});
+    }
+    function spawnBug(){
+      const x = Math.random()*cv.width;
+      const y = -20;
+      const vy = 1.8 + Math.random()*1.6 * state.speedScale;
+      const phase = Math.random()*Math.PI*2;
+      bugs.push({x,y,vy,phase});
+    }
+
+    // Resize crisp canvas
+    function fitCanvas(){
+      const rect = cv.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio||1);
+      const w = Math.floor(rect.width*dpr), h = Math.floor(rect.height*dpr);
+      if(cv.width!==w || cv.height!==h){ cv.width=w; cv.height=h; capy.y=cv.height-90; }
+    }
+    addEventListener('resize', fitCanvas); fitCanvas();
+
+    // Math helpers
+    const aabb = (ax,ay,aw,ah, bx,by,bw,bh)=> ax < bx+bw && ax+aw > bx && ay < by+bh && ay+ah > by;
+
+    // Loop
+    let lastT = 0;
+    function loop(t){
+      if(!state.running) return;
+      let dt = Math.min(33, t - lastT);
+      lastT = t;
+
+      if(!state.paused){
+        update(dt);
+      }
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    function update(dt){
+      // time kept only for difficulty & spawn pacing
+      state.timeMs += dt;
+
+      // difficulty
+      state.speedScale = 1 + Math.min(2.2, state.timeMs / 35000);
+
+      // spawn logic
+      if(state.timeMs - state.lastSpawn > 500 / state.speedScale){
+        (Math.random() < 0.7 ? spawnOrange : spawnBug)();
+        state.lastSpawn = state.timeMs;
+      }
+
+      // movement
+      const move = (keys.has('left')?-1:0) + (keys.has('right')?1:0);
+      capy.vx = move * capy.speed * (cv.width/960);
+      capy.x += capy.vx;
+      capy.x = Math.max(40, Math.min(cv.width-40, capy.x));
+
+      // oranges => score only increases here
+      for(let i=oranges.length-1;i>=0;i--){
+        const g = oranges[i];
+        g.y += g.vy * (cv.height/540);
+
+        const bw=capy.w, bh=capy.h, bx=capy.x-bw/2, by=capy.y-bh/2;
+        if(aabb(bx,by,bw,bh, g.x-g.r, g.y-g.r, g.r*2, g.r*2)){
+          oranges.splice(i,1);
+          state.score += 15;
+          state.collected++;
+          popHeart(g.x,g.y);
+          updateScoreLabel();
+        }else if(g.y - g.r > cv.height+20){
+          oranges.splice(i,1);
+        }
+      }
+
+      // bugs
+      for(let i=bugs.length-1;i>=0;i--){
+        const b = bugs[i];
+        b.y += b.vy * (cv.height/540);
+        b.x += Math.sin((state.timeMs*0.005)+b.phase) * 1.6;
+
+        const bw=capy.w, bh=capy.h, bx=capy.x-bw/2, by=capy.y-bh/2;
+        if(aabb(bx,by,bw,bh, b.x-10, b.y-6, 20,12)){ capy.alive=false; }
+
+        if(b.y > cv.height+30) bugs.splice(i,1);
+      }
+
+      // bubbles
+      for(const b of bubbles){
+        b.y -= b.vy;
+        if(b.y < -10){ b.y = cv.height+10; b.x = Math.random()*cv.width; }
+      }
+
+      // hearts
+      for(let i=hearts.length-1;i>=0;i--){
+        const h=hearts[i];
+        h.a-=0.02; h.y-=0.5;
+        if(h.a<=0) hearts.splice(i,1);
+      }
+
+      if(!capy.alive) endGame();
+    }
+
+    function endGame(){
+      state.running=false; state.paused=false;
+      state.high = Math.max(state.high, state.score);
+      finalScore.textContent = `Skor: ${state.score} · Rekor: ${state.high}`;
+      overOv.classList.add('show');
+      pauseBtn.textContent = 'Duraklat';
+    }
+    function updateScoreLabel(){
+      scoreEl.textContent = `Skor: ${state.score}`;
+      // If you want to show collected count too, use:
+      // scoreEl.textContent = `Skor: ${state.score} · Portakal: ${state.collected}`;
+    }
+    function popHeart(x,y){ hearts.push({x,y,a:1}); }
+
+    function render(){
+      ctx.clearRect(0,0,cv.width,cv.height);
+
+      // background
+      const g = ctx.createLinearGradient(0,0,0,cv.height);
+      g.addColorStop(0,'#f7d9e6'); g.addColorStop(1,'#bdeaea');
+      ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
+
+      // water pool
+      const wg = ctx.createLinearGradient(0, cv.height-160, 0, cv.height);
+      wg.addColorStop(0,'rgba(80,160,200,.18)');
+      wg.addColorStop(1,'rgba(80,200,200,.28)');
+      ctx.fillStyle = wg; ctx.fillRect(0, cv.height-160, cv.width, 160);
+
+      // bubbles
+      ctx.fillStyle='rgba(200,240,255,.35)';
+      for(const b of bubbles){ ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill(); }
+
+      // capy
+      drawCapy(capy.x, capy.y, capy.w, capy.h);
+
+      // oranges
+      for(const o of oranges){ drawOrange(o.x,o.y,o.r); }
+
+      // bugs
+      for(const m of bugs){ drawBug(m.x,m.y); }
+
+      // hearts
+      for(const h of hearts){ ctx.globalAlpha=h.a; drawHeart(h.x,h.y,10); ctx.globalAlpha=1; }
+    }
+
+    // Drawing helpers (no Turkish chars in comments)
+    function rrect(x,y,w,h,r,fill){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); }
+    function drawCapy(cx,cy,w,h){
+      ctx.save(); ctx.translate(cx,cy);
+      rrect(-w/2,-h/2,w,h,18,'#c59a6b');
+      ctx.fillStyle='#b4895e'; ctx.fillRect(-w/2+6,-h/2+10, w-12, h-24);
+      rrect(w*0.2,-h*0.45,w*0.36,h*0.4,12,'#c59a6b');
+      rrect(w*0.45,-h*0.6, w*0.16, h*0.18,6,'#9c7a52');
+      ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(w*0.32,-h*0.22,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#1b1b1b'; ctx.fillRect(w*0.47,-h*0.1,6,4);
+      ctx.fillStyle='#9c7a52'; ctx.fillRect(-w*0.25, h*0.45, 18,6); ctx.fillRect(w*0.05, h*0.45, 18,6);
+      ctx.strokeStyle='rgba(120,227,200,.35)'; ctx.lineWidth=2; ctx.beginPath(); ctx.ellipse(0, h*0.58, w*0.65, 12, 0, 0, Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
+    function drawOrange(x,y,r){
+      const grad = ctx.createRadialGradient(x-r*0.4,y-r*0.4,r*0.2, x,y,r);
+      grad.addColorStop(0,'#ffe9a6'); grad.addColorStop(1,'#ffb341');
+      ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#7ee5b0'; ctx.beginPath(); ctx.ellipse(x+r*0.1, y-r*0.9, r*0.5, r*0.25, .6, 0, Math.PI*2); ctx.fill();
+    }
+    function drawBug(x,y){
+      ctx.save(); ctx.translate(x,y);
+      ctx.fillStyle='#dddddd'; ctx.fillRect(-6,-3,12,6);
+      ctx.fillStyle='#bbbbbb'; ctx.fillRect(-9,-3,4,6);
+      ctx.globalAlpha=.6; ctx.fillStyle='#cfefff';
+      ctx.beginPath(); ctx.ellipse(2,-6,10,5,-.4,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(2, 6,10,5, .4,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1; ctx.fillStyle='#888'; ctx.fillRect(6,-1,6,2);
+      ctx.restore();
+    }
+    function drawHeart(x,y,s){
+      ctx.save(); ctx.translate(x,y); ctx.rotate(-.1); ctx.fillStyle='#ff8fb8';
+      ctx.beginPath(); ctx.moveTo(0,s*.6);
+      ctx.bezierCurveTo(s*1.4,s*-.2, s*.8,-s*.9, 0,-s*.3);
+      ctx.bezierCurveTo(-s*.8,-s*.9, -s*1.4,-s*.2, 0,s*.6);
+      ctx.fill(); ctx.restore();
+    }
+  </script>
+</body>
+</html>
+>>>>>>> 1aed175b49cf9dcf9227a7b80b41d815a33923fa
