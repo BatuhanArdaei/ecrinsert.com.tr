@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
+    /* === TEMEL AYARLAR === */
     * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
     
     body {
@@ -16,16 +17,18 @@
       overflow: hidden;
       background: #000;
       font-family: 'Fredoka', sans-serif;
-      touch-action: none; /* Sayfa kaydırmayı engeller */
+      touch-action: none; /* Mobilde sayfa kaymasını engeller */
     }
 
     canvas { display: block; width: 100vw; height: 100vh; }
 
+    /* === ARAYÜZ === */
     #ui-layer {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none; display: flex; flex-direction: column; z-index: 10;
     }
 
+    /* Menü Butonu */
     .nav-btn {
       position: absolute; top: 20px; left: 20px;
       background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
@@ -35,6 +38,7 @@
       display: flex; align-items: center; gap: 8px;
     }
 
+    /* Skor */
     .score-box {
       position: absolute; top: 20px; right: 20px;
       background: rgba(255, 107, 129, 0.9); color: white;
@@ -42,39 +46,22 @@
       box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
-    #menu-overlay {
+    /* Game Over Ekranı (Başlangıçta gizli) */
+    #game-over-screen {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 30; pointer-events: auto; transition: opacity 0.3s;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 30; color: white; text-align: center;
+      animation: fadeIn 0.3s;
     }
 
-    .card {
-      background: white; padding: 30px 40px; border-radius: 25px;
-      text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      max-width: 90%; width: 350px;
-      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    h1 { color: #ff6b81; font-size: 2rem; margin-bottom: 10px; }
-    p { color: #777; margin-bottom: 25px; font-size: 1rem; line-height: 1.5; }
-    
-    .btn-play {
-      background: linear-gradient(45deg, #ff9a9e, #ff6b81); color: white; border: none;
-      padding: 15px 40px; font-size: 1.2rem; border-radius: 50px; cursor: pointer;
-      font-family: 'Fredoka', sans-serif; font-weight: 600;
-      box-shadow: 0 10px 20px rgba(255, 107, 129, 0.3); transition: transform 0.2s;
-      /* Mobilde tıklanabilirliği garanti etmek için */
-      pointer-events: auto; 
-      touch-action: manipulation;
-    }
-    .btn-play:active { transform: scale(0.95); }
+    h1 { font-size: 2.5rem; margin-bottom: 10px; color: #ff6b81; text-shadow: 2px 2px 0 #000; }
+    p { font-size: 1.2rem; margin-bottom: 20px; }
+    .blink { animation: blinker 1.5s linear infinite; font-weight: bold; color: #ffd1dc; }
+    @keyframes blinker { 50% { opacity: 0; } }
 
-    .tutorial {
-      margin-top: 20px; font-size: 0.85rem; color: #aaa;
-      display: flex; align-items: center; justify-content: center; gap: 5px;
-    }
   </style>
 </head>
 <body>
@@ -88,25 +75,20 @@
     </div>
   </div>
 
-  <div id="menu-overlay">
-    <div class="card">
-      <h1 id="menu-title">Aşk Koşusu 🐾</h1>
-      <p id="menu-desc">Skor arttıkça hava kararacak!<br>Hazır mısın?</p>
-      <!-- onclick ile doğrudan bağladık, en garanti yöntem -->
-      <button class="btn-play" onclick="startGame()">BAŞLA</button>
-      <div class="tutorial"><i class="fa-solid fa-hand-pointer"></i> Zıplamak için dokun</div>
-    </div>
+  <!-- YANINCA ÇIKACAK EKRAN -->
+  <div id="game-over-screen">
+    <h1>Oyun Bitti! 🥺</h1>
+    <p id="final-score">Skorun: 0</p>
+    <div class="blink">TEKRAR BAŞLAMAK İÇİN DOKUN</div>
   </div>
 
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
-    const menuOverlay = document.getElementById('menu-overlay');
-    const menuTitle = document.getElementById('menu-title');
-    const menuDesc = document.getElementById('menu-desc');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const finalScoreEl = document.getElementById('final-score');
     const scoreDisplay = document.getElementById('score-display');
-    // Butonu seçmeye gerek kalmadı, onclick kullandık.
 
     let isPlaying = false;
     let score = 0;
@@ -121,7 +103,7 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // === RENK GEÇİŞ FONKSİYONU ===
+    // === RENK GEÇİŞLERİ ===
     function lerpColor(a, b, amount) {
         const ah = parseInt(a.replace(/#/g, ''), 16),
               ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
@@ -137,20 +119,24 @@
     const player = {
       x: 50, y: 0, w: 60, h: 40, dy: 0, jumpForce: 16, gravity: 0.55,
       grounded: false, jumpCount: 0, maxJumps: 2, color: '#c59a6b',
+      
       draw: function() {
         ctx.save(); ctx.translate(this.x, this.y);
         let bob = this.grounded ? Math.sin(frame * 0.2) * 2 : 0;
         if (!this.grounded) ctx.rotate(-0.1);
 
         ctx.fillStyle = this.color;
-        ctx.beginPath(); ctx.roundRect(0, 0 + bob, this.w, this.h, 15); ctx.fill();
-        ctx.beginPath(); ctx.roundRect(this.w - 25, -15 + bob, 40, 40, 14); ctx.fill();
-        ctx.fillStyle = '#3e2723'; ctx.beginPath(); ctx.arc(this.w + 5, -5 + bob, 4, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(this.w + 6, -7 + bob, 1.5, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.ellipse(this.w - 10, -15 + bob, 6, 8, 0.5, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#3e2723'; ctx.beginPath(); ctx.roundRect(this.w + 10, 2 + bob, 8, 6, 3); ctx.fill();
-        ctx.fillStyle = 'rgba(255, 105, 180, 0.4)'; ctx.beginPath(); ctx.arc(this.w, 5 + bob, 6, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(0, 0 + bob, this.w, this.h, 15); ctx.fill(); // Gövde
+        ctx.beginPath(); ctx.roundRect(this.w - 25, -15 + bob, 40, 40, 14); ctx.fill(); // Kafa
+        
+        ctx.fillStyle = '#3e2723'; ctx.beginPath(); ctx.arc(this.w + 5, -5 + bob, 4, 0, Math.PI*2); ctx.fill(); // Göz
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(this.w + 6, -7 + bob, 1.5, 0, Math.PI*2); ctx.fill(); // Göz parıltısı
+        
+        ctx.fillStyle = '#8d6e63'; ctx.beginPath(); ctx.ellipse(this.w - 10, -15 + bob, 6, 8, 0.5, 0, Math.PI*2); ctx.fill(); // Kulak
+        ctx.fillStyle = '#3e2723'; ctx.beginPath(); ctx.roundRect(this.w + 10, 2 + bob, 8, 6, 3); ctx.fill(); // Burun
+        ctx.fillStyle = 'rgba(255, 105, 180, 0.4)'; ctx.beginPath(); ctx.arc(this.w, 5 + bob, 6, 0, Math.PI*2); ctx.fill(); // Yanak
 
+        // Ayaklar
         ctx.fillStyle = '#8d6e63';
         if (this.grounded) {
             let legSwing = Math.sin(frame * 0.3) * 8;
@@ -211,8 +197,7 @@
             let pulse = Math.sin(frame * 0.1) * 3;
             ctx.fillStyle = '#ff4757';
             let x = this.x, y = this.y, size = this.size + pulse;
-            ctx.beginPath();
-            ctx.moveTo(x, y);
+            ctx.beginPath(); ctx.moveTo(x, y);
             ctx.bezierCurveTo(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
             ctx.bezierCurveTo(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
             ctx.fill();
@@ -231,12 +216,13 @@
         }
     }
 
-    // === GÜN DÖNGÜSÜ & ÇİZİM ===
+    // === GÜN DÖNGÜSÜ ===
     let bgOffset1 = 0, bgOffset2 = 0;
     const DayColors = { top: '#87CEEB', bot: '#E0F7FA', sun: '#FFD54F', hill: '#A5D6A7', ground: '#6D4C41' };
     const NightColors = { top: '#0d1b2a', bot: '#1b263b', sun: '#ffffff', hill: '#14213d', ground: '#221612' };
 
     function drawBackground() {
+        // 10 Puan (1 kalp) sonra kararmaya başlar, 100'de tam gece olur
         let darkFactor = 0;
         if (score > 10) {
             darkFactor = (score - 10) / 90; 
@@ -328,43 +314,51 @@
     }
 
     function startGame() {
-        // Butona basıldığında çalışacak fonksiyon
         isPlaying = true; score = 0; gameSpeed = 6; frame = 0;
         obstacles = []; hearts = []; particles = [];
         scoreDisplay.innerText = '0';
         player.y = H - 150; player.dy = 0; player.grounded = false;
-        menuOverlay.style.opacity = '0'; setTimeout(() => menuOverlay.style.display = 'none', 300);
+        gameOverScreen.style.display = 'none';
         gameLoop();
     }
 
     function gameOver() {
         isPlaying = false;
-        menuOverlay.style.display = 'flex'; setTimeout(() => menuOverlay.style.opacity = '1', 10);
-        menuTitle.innerText = "Oyun Bitti! 🥺"; menuDesc.innerText = `Skorun: ${score}\nTekrar dene sevgilim!`;
-        document.querySelector('.btn-play').innerText = "TEKRAR OYNA";
+        gameOverScreen.style.display = 'flex';
+        finalScoreEl.innerText = `Skorun: ${score}`;
     }
 
-    function handleJump(e) {
-        // Eğer dokunulan yer butonsa veya menü ise zıplamayı tetikleme
-        if(e.target.tagName === 'BUTTON' || e.target.closest('.card') || e.target.closest('.nav-btn')) return;
+    function handleInput(e) {
+        // Menü butonuna tıklanırsa zıplama yapma
+        if(e.target.closest('.nav-btn')) return;
 
-        // Sadece oyun alanı içinde dokunmayı engelle (zoom/scroll)
-        if(e.type === 'touchstart') e.preventDefault();
+        if (e.type === 'touchstart') e.preventDefault(); // Mobilde scroll'u engelle
 
-        if (!isPlaying) { 
-           // Menü açıkken boşluğa tıklanırsa bir şey yapma
-           return; 
-        } else { 
-           player.jump(); 
+        if (!isPlaying) {
+            // Oyun bittiyse ve ekrana dokunulursa yeniden başlat
+            startGame();
+        } else {
+            // Oyun devam ediyorsa zıpla
+            player.jump();
         }
     }
-    
-    // Global dinleyiciler (Ekrana dokununca zıpla)
-    window.addEventListener('touchstart', handleJump, {passive: false});
-    window.addEventListener('mousedown', handleJump);
-    window.addEventListener('keydown', (e) => { if(e.code === 'Space') handleJump(e); });
 
-    resize(); drawBackground(); player.y = H - 100 - player.h; player.draw();
+    // === GİRİŞ NOKTASI ===
+    // Sayfa yüklendiğinde oyun direkt başlasın
+    window.onload = () => {
+        startGame();
+    };
+
+    // Dokunma ve Tıklama Kontrolleri
+    window.addEventListener('touchstart', handleInput, {passive: false});
+    window.addEventListener('mousedown', handleInput);
+    window.addEventListener('keydown', (e) => { 
+        if(e.code === 'Space') {
+            if(!isPlaying) startGame();
+            else player.jump();
+        }
+    });
+
   </script>
 </body>
 </html>
