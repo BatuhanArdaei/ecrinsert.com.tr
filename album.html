@@ -1,24 +1,662 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ortak Albüm</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/album.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Instagram • Anılarımız</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Grand+Hotel&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+
+  <style>
+    :root {
+      --bg-color: #000000;
+      --card-bg: #121212; /* Insta Dark Card */
+      --text-main: #f5f5f5;
+      --text-sub: #a8a8a8;
+      --border: #363636;
+      --blue: #0095f6;
+      --like: #ff3040;
+      --overlay: rgba(0,0,0,0.6);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; padding-bottom: 50px; /* Bottom nav boşluğu */
+    }
+
+    /* === GİRİŞ EKRANI === */
+    #auth-screen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #000; z-index: 3000;
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+    }
+    .auth-box {
+        border: 1px solid var(--border); padding: 40px; width: 350px; text-align: center;
+    }
+    .logo-font { font-family: 'Grand Hotel', cursive; font-size: 3rem; margin-bottom: 30px; display: block;}
+    .input-field {
+        width: 100%; background: #262626; border: 1px solid var(--border);
+        padding: 10px; color: white; border-radius: 4px; margin-bottom: 10px; outline: none;
+    }
+    .btn-primary {
+        width: 100%; background: var(--blue); color: white; font-weight: 600;
+        padding: 8px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;
+    }
+    .btn-primary:disabled { opacity: 0.7; }
+
+    /* === ANA SAYFA & NAV === */
+    #main-app { display: none; width: 100%; max-width: 470px; min-height: 100vh; position: relative;}
+
+    /* Header */
+    .top-nav {
+        position: sticky; top: 0; background: var(--bg-color); z-index: 50;
+        border-bottom: 1px solid var(--border); height: 50px;
+        display: flex; justify-content: space-between; align-items: center; padding: 0 15px;
+    }
+    .nav-logo { font-family: 'Grand Hotel', cursive; font-size: 1.6rem; }
+
+    /* Bottom Nav */
+    .bottom-nav {
+        position: fixed; bottom: 0; width: 100%; max-width: 470px;
+        height: 50px; background: var(--bg-color); border-top: 1px solid var(--border);
+        display: flex; justify-content: space-around; align-items: center; z-index: 100;
+    }
+    .nav-icon { font-size: 1.5rem; cursor: pointer; color: var(--text-main); }
+    .nav-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--text-main); }
+
+    /* === FEED GÖRÜNÜMÜ === */
+    .feed-container { padding-top: 10px; padding-bottom: 60px; }
+    
+    .feed-post { margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    
+    .post-header { padding: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer;}
+    .post-avatar-small { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .post-username { font-weight: 600; font-size: 0.9rem; }
+    .verified { color: var(--blue); margin-left: 4px; font-size: 0.8rem; }
+
+    .post-image { width: 100%; aspect-ratio: 4/5; object-fit: cover; background: #1a1a1a; cursor: pointer; }
+
+    .post-actions-bar { padding: 10px; display: flex; justify-content: space-between; font-size: 1.5rem; }
+    .action-left { display: flex; gap: 15px; }
+    .icon-btn { cursor: pointer; transition: 0.2s; }
+    .icon-btn:hover { color: var(--text-sub); }
+    
+    .post-likes { padding: 0 10px; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; }
+    .post-caption { padding: 0 10px; font-size: 0.9rem; }
+    .post-time { padding: 5px 10px; font-size: 0.7rem; color: var(--text-sub); text-transform: uppercase; }
+
+    /* === PROFİL SAYFASI === */
+    #profile-view { display: none; padding-top: 10px; }
+    
+    .profile-header { display: flex; padding: 20px; align-items: center; }
+    .profile-pic-large { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--border); padding: 2px; margin-right: 20px; object-fit: cover; }
+    .profile-stats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
+    .stat-num { font-weight: 700; font-size: 1.1rem; display: block; }
+    .stat-label { font-size: 0.8rem; color: var(--text-sub); }
+    
+    .profile-bio { padding: 0 20px 20px; font-size: 0.9rem; }
+    .profile-bio .real-name { font-weight: 600; }
+
+    .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .grid-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; cursor: pointer; }
+
+    /* === HAMBURGER MENU (LOGOUT) === */
+    .menu-modal {
+        position: fixed; bottom: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 2000; display: none;
+        align-items: flex-end; justify-content: center;
+    }
+    .menu-content {
+        background: #262626; width: 100%; border-radius: 15px 15px 0 0;
+        overflow: hidden; padding: 10px 0;
+    }
+    .menu-item {
+        padding: 15px; text-align: center; border-bottom: 1px solid var(--border);
+        font-weight: 600; cursor: pointer;
+    }
+    .menu-item:last-child { border: none; }
+    .danger-text { color: var(--like); }
+
+    /* === POST DETAY MODALI === */
+    .post-modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #000; z-index: 1500; display: none; flex-direction: column;
+        overflow-y: auto;
+    }
+    .modal-nav {
+        padding: 10px 15px; display: flex; align-items: center; border-bottom: 1px solid var(--border);
+        position: sticky; top: 0; background: #000; z-index: 10;
+    }
+    .back-btn { font-size: 1.5rem; margin-right: 15px; cursor: pointer; }
+    .modal-title { font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: var(--text-sub); }
+
+    /* === 3 NOKTA MODALI === */
+    .options-modal {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 2500; display: none;
+        align-items: center; justify-content: center;
+    }
+    .options-content {
+        background: #262626; width: 300px; border-radius: 10px; text-align: center;
+        overflow: hidden;
+    }
+    .option-item { padding: 15px; border-bottom: 1px solid #363636; cursor: pointer; font-size: 0.9rem; }
+    .option-item:last-child { border: none; }
+
+    /* === YORUM İNPUT === */
+    .comment-bar {
+        position: fixed; bottom: 0; width: 100%; max-width: 470px;
+        background: #000; padding: 10px; display: none; align-items: center; border-top: 1px solid var(--border);
+        z-index: 1600;
+    }
+    .comment-field {
+        flex: 1; background: transparent; border: none; color: white; outline: none; padding: 5px;
+    }
+    .post-link { color: var(--blue); font-weight: 600; cursor: pointer; margin-left: 10px; }
+
+    /* === UPLOAD MODALI === */
+    .upload-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #000; z-index: 2000; display: none; flex-direction: column;
+    }
+    
+    /* Toast Bildirim */
+    #toast {
+        position: fixed; top: -50px; left: 50%; transform: translateX(-50%);
+        background: #262626; color: white; padding: 10px 20px; border-radius: 5px;
+        z-index: 9999; transition: top 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+
+  </style>
 </head>
 <body>
-  <header>
-    <h1>📷 Ortak Albüm</h1>
-    <button id="refreshBtn">Yenile 🔄</button>
-  </header>
 
-  <main style="display:flex;flex-direction:column;align-items:center;gap:20px;margin:30px 0 60px;">
-    <input id="fileInput" type="file" multiple accept="image/*,video/*" hidden>
-    <button id="uploadBtn">Fotoğraf / Video Yükle</button>
+  <div id="toast">İşlem Başarılı</div>
 
-    <div id="gallery" class="gallery-grid"></div>
-  </main>
+  <!-- 1. LOGIN -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <span class="logo-font">Anılarımız</span>
+      <input type="email" id="email" class="input-field" placeholder="E-posta">
+      <input type="password" id="password" class="input-field" placeholder="Şifre">
+      <button class="btn-primary" onclick="login()">Giriş Yap</button>
+    </div>
+  </div>
 
-  <script src="/album.js" defer></script>
+  <!-- 2. APP -->
+  <div id="main-app">
+    <!-- Üst Bar -->
+    <div class="top-nav" id="top-nav">
+        <span class="nav-logo">Anılarımız</span>
+        <div style="display:flex; gap:15px;">
+            <i class="fa-regular fa-heart" style="font-size:1.4rem;"></i>
+            <i class="fa-regular fa-paper-plane" style="font-size:1.4rem;"></i>
+        </div>
+    </div>
+
+    <!-- Feed Alanı -->
+    <div id="feed-view" class="feed-container"></div>
+
+    <!-- Profil Alanı -->
+    <div id="profile-view">
+        <div class="profile-header">
+            <img src="" class="profile-pic-large" id="prof-img">
+            <div class="profile-stats">
+                <div><span class="stat-num" id="prof-posts-count">0</span><span class="stat-label">Gönderi</span></div>
+                <div><span class="stat-num">31M</span><span class="stat-label">Takipçi</span></div>
+                <div><span class="stat-num">1</span><span class="stat-label">Takip</span></div>
+            </div>
+        </div>
+        <div class="profile-bio">
+            <div class="real-name" id="prof-name">İsim Soyisim</div>
+            <div style="color:var(--text-main);">Özel alanımıza hoş geldin 💖</div>
+        </div>
+        
+        <!-- Grid Nav -->
+        <div style="display:flex; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:10px;">
+            <div style="flex:1; text-align:center; color:var(--text-main); font-size:1.5rem;"><i class="fa-solid fa-table-cells"></i></div>
+        </div>
+
+        <div class="profile-grid" id="prof-grid"></div>
+    </div>
+
+    <!-- Alt Bar -->
+    <div class="bottom-nav">
+      <i class="fa-solid fa-house nav-icon" onclick="switchTab('feed')"></i>
+      <i class="fa-regular fa-square-plus nav-icon" onclick="openUpload()"></i>
+      <img src="" class="nav-avatar" id="nav-avatar" onclick="switchTab('profile', currentUserData.uid)">
+    </div>
+  </div>
+
+  <!-- 3. POST DETAY (TAM EKRAN) -->
+  <div class="post-modal" id="post-modal">
+      <div class="modal-nav">
+          <i class="fa-solid fa-arrow-left back-btn" onclick="closePostModal()"></i>
+          <span class="modal-title">Gönderi</span>
+          <i class="fa-solid fa-ellipsis" style="margin-left:auto; font-size:1.2rem; cursor:pointer;" onclick="openOptions()"></i>
+      </div>
+      
+      <!-- İçerik JS ile buraya kopyalanacak -->
+      <div id="modal-content-area"></div>
+      
+      <!-- Yorumlar -->
+      <div style="padding:15px; border-top:1px solid var(--border);">
+          <div style="font-weight:600; margin-bottom:10px;">Yorumlar</div>
+          <div id="modal-comments" style="margin-bottom:60px;"></div>
+      </div>
+
+      <!-- Yorum Yaz -->
+      <div class="comment-bar" id="comment-bar" style="display:flex;">
+          <input type="text" class="comment-field" id="comment-input" placeholder="Yorum ekle...">
+          <div class="post-link" onclick="sendComment()">Paylaş</div>
+      </div>
+  </div>
+
+  <!-- 4. UPLOAD MODAL -->
+  <div class="upload-overlay" id="upload-overlay">
+      <div class="modal-nav">
+          <i class="fa-solid fa-xmark back-btn" onclick="closeUpload()"></i>
+          <span class="modal-title">Yeni Gönderi</span>
+          <span class="post-link" onclick="uploadPost()" style="margin-left:auto;">Paylaş</span>
+      </div>
+      <div style="padding:20px; text-align:center;">
+          <input type="file" id="file-input" hidden accept="image/*" onchange="previewFile()">
+          <img id="upload-preview" style="width:100%; max-height:400px; object-fit:contain; background:#1a1a1a; display:none;">
+          <button class="btn-primary" onclick="document.getElementById('file-input').click()" id="select-btn">Fotoğraf Seç</button>
+          <input type="text" id="upload-caption" class="input-field" placeholder="Açıklama yaz..." style="margin-top:20px;">
+      </div>
+  </div>
+
+  <!-- 5. HAMBURGER MENU (PROFIL İÇİN) -->
+  <div class="menu-modal" id="hamburger-menu" onclick="closeHamburger()">
+      <div class="menu-content">
+          <div class="menu-item danger-text" onclick="logout()">Çıkış Yap</div>
+          <div class="menu-item" onclick="closeHamburger()">İptal</div>
+      </div>
+  </div>
+
+  <!-- 6. 3 NOKTA MENÜSÜ -->
+  <div class="options-modal" id="options-menu" onclick="closeOptions(event)">
+      <div class="options-content" id="options-list">
+          <!-- JS ile dolacak -->
+      </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion, getDoc, deleteDoc, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCEPp1yxTTNvki6opO83v9UJnVJmPkyYH8",
+      authDomain: "ecrinsertcomtr.firebaseapp.com",
+      projectId: "ecrinsertcomtr",
+      storageBucket: "ecrinsertcomtr.firebasestorage.app",
+      messagingSenderId: "293542851828",
+      appId: "1:293542851828:web:d3a88ce711154e2316daa1",
+      measurementId: "G-QYGT6JJYJ5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // KALICILIK YOK (Sekme kapanınca çıkış)
+    setPersistence(auth, browserSessionPersistence);
+
+    const SPECIAL_USERS = {
+        "sert43213@gmail.com": { handle: "dteccrn", verified: true, name: "Ecrin" },
+        "batuhanardiin@gmail.com": { handle: "ardab4tu", verified: true, name: "Batuhan" }
+    };
+
+    let currentUserData = {};
+    let currentPostData = null; // Detaydaki post
+    let allPosts = []; // Feed için cache
+
+    // === AUTH ===
+    window.login = () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        signInWithEmailAndPassword(auth, email, pass).catch(e => showToast(e.message));
+    }
+
+    window.logout = () => {
+        signOut(auth).then(() => location.reload());
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        if(user) {
+            setupUser(user);
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            loadFeed();
+        } else {
+            document.getElementById('auth-screen').style.display = 'flex';
+        }
+    });
+
+    function setupUser(user) {
+        const email = user.email;
+        if(SPECIAL_USERS[email]) {
+            currentUserData = {
+                uid: user.uid,
+                email: email,
+                username: SPECIAL_USERS[email].handle,
+                name: SPECIAL_USERS[email].name,
+                verified: true,
+                photo: `https://ui-avatars.com/api/?name=${SPECIAL_USERS[email].handle}&background=random`
+            };
+        } else {
+            currentUserData = {
+                uid: user.uid,
+                email: email,
+                username: email.split('@')[0],
+                name: "Kullanıcı",
+                verified: false,
+                photo: "https://via.placeholder.com/150"
+            };
+        }
+        document.getElementById('nav-avatar').src = currentUserData.photo;
+    }
+
+    // === FEED ===
+    function loadFeed() {
+        const q = query(collection(db, "photos"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            allPosts = [];
+            snapshot.forEach(doc => allPosts.push({id: doc.id, ...doc.data()}));
+            renderFeed();
+        });
+    }
+
+    function renderFeed() {
+        const container = document.getElementById('feed-view');
+        container.innerHTML = "";
+        
+        allPosts.forEach(post => {
+            const div = document.createElement('div');
+            div.className = 'feed-post';
+            div.innerHTML = `
+                <div class="post-header">
+                    <div class="user-info" onclick="switchTab('profile', '${post.uid}')">
+                        <img src="${post.userPhoto}" class="post-avatar-small">
+                        <div class="post-username" style="margin-left:10px;">${post.username}</div>
+                        ${post.verified ? '<i class="fa-solid fa-circle-check verified"></i>' : ''}
+                    </div>
+                    <i class="fa-solid fa-ellipsis" style="cursor:pointer;" onclick="openPostOptions('${post.id}', '${post.uid}')"></i>
+                </div>
+                <img src="${post.url}" class="post-image" onclick="openDetail('${post.id}')">
+                <div class="post-actions-bar">
+                    <div class="action-left">
+                        <i class="fa-regular fa-heart icon-btn"></i>
+                        <i class="fa-regular fa-comment icon-btn" onclick="openDetail('${post.id}')"></i>
+                        <i class="fa-regular fa-paper-plane icon-btn"></i>
+                    </div>
+                    <i class="fa-regular fa-bookmark icon-btn" onclick="downloadImage('${post.url}')"></i>
+                </div>
+                <div class="post-caption">
+                    <span style="font-weight:600;">${post.username}</span> ${post.caption}
+                </div>
+                <div class="post-time">${new Date(post.createdAt).toLocaleDateString('tr-TR')}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // === PROFİL ===
+    window.switchTab = (tab, uid = null) => {
+        // Önce hepsini gizle
+        document.getElementById('feed-view').style.display = 'none';
+        document.getElementById('profile-view').style.display = 'none';
+        
+        // Üst Bar ayarı
+        const topNav = document.getElementById('top-nav');
+
+        if (tab === 'feed') {
+            document.getElementById('feed-view').style.display = 'block';
+            topNav.innerHTML = `
+                <span class="nav-logo">Anılarımız</span>
+                <div style="display:flex; gap:15px;">
+                    <i class="fa-regular fa-heart" style="font-size:1.4rem;"></i>
+                    <i class="fa-regular fa-paper-plane" style="font-size:1.4rem;"></i>
+                </div>`;
+        } else if (tab === 'profile') {
+            document.getElementById('profile-view').style.display = 'block';
+            
+            // Eğer kendi profilimse Hamburger menü göster
+            const isMe = (uid === currentUserData.uid);
+            let targetUser = isMe ? currentUserData : null; 
+
+            // Eğer başkasına tıkladıysak (Basitlik için post listesinden buluyoruz)
+            if (!isMe) {
+                const found = allPosts.find(p => p.uid === uid);
+                if(found) targetUser = { username: found.username, name: found.username, photo: found.userPhoto, verified: found.verified };
+                else targetUser = { username: "Bilinmiyor", name: "Bilinmiyor", photo: "", verified: false };
+            }
+
+            topNav.innerHTML = `
+                <div style="font-weight:700; font-size:1.2rem;">${targetUser.username} ${targetUser.verified ? '<i class="fa-solid fa-circle-check verified"></i>' : ''}</div>
+                ${isMe ? '<i class="fa-solid fa-bars" style="font-size:1.4rem; cursor:pointer;" onclick="openHamburger()"></i>' : ''}
+            `;
+
+            // Profil Bilgilerini Doldur
+            document.getElementById('prof-img').src = targetUser.photo;
+            document.getElementById('prof-name').innerText = targetUser.name;
+            
+            // Kullanıcının Postlarını Filtrele
+            const userPosts = allPosts.filter(p => p.uid === uid);
+            document.getElementById('prof-posts-count').innerText = userPosts.length;
+            
+            const grid = document.getElementById('prof-grid');
+            grid.innerHTML = "";
+            userPosts.forEach(post => {
+                const img = document.createElement('img');
+                img.src = post.url;
+                img.className = 'grid-img';
+                img.onclick = () => openDetail(post.id);
+                grid.appendChild(img);
+            });
+        }
+    }
+
+    // === DETAY MODALI ===
+    window.openDetail = (postId) => {
+        currentPostData = allPosts.find(p => p.id === postId);
+        if(!currentPostData) return;
+
+        const modal = document.getElementById('post-modal');
+        const content = document.getElementById('modal-content-area');
+        const commentsDiv = document.getElementById('modal-comments');
+
+        content.innerHTML = `
+            <div class="post-header" style="border-bottom:none;">
+                <div class="user-info">
+                    <img src="${currentPostData.userPhoto}" class="post-avatar-small">
+                    <div class="post-username" style="margin-left:10px;">${currentPostData.username}</div>
+                    ${currentPostData.verified ? '<i class="fa-solid fa-circle-check verified"></i>' : ''}
+                </div>
+            </div>
+            <img src="${currentPostData.url}" style="width:100%; max-height:60vh; object-fit:contain; background:#1a1a1a;">
+            <div class="post-caption" style="margin-top:10px;">
+                <span style="font-weight:600;">${currentPostData.username}</span> ${currentPostData.caption}
+            </div>
+        `;
+
+        renderComments(currentPostData.comments || []);
+        modal.style.display = 'flex';
+    }
+
+    window.closePostModal = () => {
+        document.getElementById('post-modal').style.display = 'none';
+        currentPostData = null;
+    }
+
+    // === 3 NOKTA MENÜSÜ & İŞLEMLER ===
+    window.openPostOptions = (postId, ownerId) => { // Feed'den çağrıldığında
+        currentPostData = allPosts.find(p => p.id === postId);
+        openOptions();
+    }
+
+    window.openOptions = () => { // Detay'dan çağrıldığında
+        const menu = document.getElementById('options-menu');
+        const list = document.getElementById('options-list');
+        list.innerHTML = "";
+
+        const isOwner = (currentPostData.uid === currentUserData.uid);
+
+        if(isOwner) {
+            list.innerHTML += `<div class="menu-item danger-text" onclick="deletePost('${currentPostData.id}', '${currentPostData.storageRef}')">Sil</div>`;
+            list.innerHTML += `<div class="menu-item">Düzenle</div>`;
+        }
+        
+        list.innerHTML += `<div class="menu-item" onclick="sharePost()">Paylaş</div>`;
+        list.innerHTML += `<div class="menu-item" onclick="downloadImage('${currentPostData.url}')">İndir</div>`;
+        list.innerHTML += `<div class="menu-item" onclick="closeOptions(null)">İptal</div>`;
+
+        menu.style.display = 'flex';
+    }
+
+    window.closeOptions = (e) => {
+        if(!e || e.target.id === 'options-menu' || e.target.classList.contains('menu-item')) {
+            document.getElementById('options-menu').style.display = 'none';
+        }
+    }
+
+    window.deletePost = async (id, refPath) => {
+        if(!confirm("Silmek istediğine emin misin?")) return;
+        try {
+            await deleteObject(ref(storage, refPath));
+            await deleteDoc(doc(db, "photos", id));
+            showToast("Gönderi Silindi");
+            closeOptions(null);
+            closePostModal();
+        } catch(e) { console.log(e); }
+    }
+
+    window.downloadImage = async (url) => {
+        try {
+            const blob = await fetch(url).then(r => r.blob());
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `ani_${Date.now()}.jpg`;
+            link.click();
+            showToast("İndiriliyor...");
+        } catch(e) { showToast("İndirme Hatası"); }
+    }
+
+    window.sharePost = () => {
+        navigator.clipboard.writeText(window.location.href).then(() => showToast("Link Kopyalandı"));
+        closeOptions(null);
+    }
+
+    // === YORUM ===
+    function renderComments(comments) {
+        const div = document.getElementById('modal-comments');
+        div.innerHTML = "";
+        comments.forEach(c => {
+            const verify = c.verified ? '<i class="fa-solid fa-circle-check verified" style="font-size:0.7rem;"></i>' : '';
+            div.innerHTML += `
+                <div style="display:flex; margin-bottom:10px; font-size:0.9rem;">
+                    <span style="font-weight:600; cursor:pointer;" onclick="closePostModal(); switchTab('profile','${c.uid}')">${c.username} ${verify}</span>
+                    <span style="margin-left:8px; color:var(--text-main);">${c.text}</span>
+                </div>
+            `;
+        });
+    }
+
+    window.sendComment = async () => {
+        const input = document.getElementById('comment-input');
+        const text = input.value.trim();
+        if(!text) return;
+
+        const newComment = {
+            uid: currentUserData.uid,
+            username: currentUserData.username,
+            verified: currentUserData.verified,
+            text: text,
+            date: Date.now()
+        };
+
+        const postRef = doc(db, "photos", currentPostData.id);
+        await updateDoc(postRef, { comments: arrayUnion(newComment) });
+        input.value = "";
+        
+        // Lokal güncelleme (Snapshot gelene kadar)
+        if(currentPostData.comments) currentPostData.comments.push(newComment);
+        else currentPostData.comments = [newComment];
+        renderComments(currentPostData.comments);
+    }
+
+    // === UPLOAD ===
+    window.openUpload = () => document.getElementById('upload-overlay').style.display = 'flex';
+    window.closeUpload = () => document.getElementById('upload-overlay').style.display = 'none';
+    
+    window.previewFile = () => {
+        const file = document.getElementById('file-input').files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('upload-preview').src = e.target.result;
+                document.getElementById('upload-preview').style.display = 'block';
+                document.getElementById('select-btn').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    window.uploadPost = () => {
+        const file = document.getElementById('file-input').files[0];
+        const caption = document.getElementById('upload-caption').value;
+        if(!file) return showToast("Dosya seçilmedi");
+
+        showToast("Yükleniyor...");
+        
+        const storageRef = ref(storage, 'posts/' + Date.now() + '_' + file.name);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on('state_changed', null, null, () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+                addDoc(collection(db, "photos"), {
+                    url, caption,
+                    uid: currentUserData.uid,
+                    username: currentUserData.username,
+                    userPhoto: currentUserData.photo,
+                    verified: currentUserData.verified,
+                    storageRef: uploadTask.snapshot.ref.fullPath,
+                    createdAt: Date.now(),
+                    comments: []
+                });
+                closeUpload();
+                showToast("Paylaşıldı!");
+                // Reset
+                document.getElementById('file-input').value = "";
+                document.getElementById('upload-caption').value = "";
+                document.getElementById('upload-preview').style.display = 'none';
+                document.getElementById('select-btn').style.display = 'block';
+            });
+        });
+    }
+
+    // === HAMBURGER ===
+    window.openHamburger = () => document.getElementById('hamburger-menu').style.display = 'flex';
+    window.closeHamburger = () => document.getElementById('hamburger-menu').style.display = 'none';
+
+    window.showToast = (msg) => {
+        const t = document.getElementById('toast');
+        t.innerHTML = msg; t.style.top = "20px";
+        setTimeout(() => t.style.top = "-50px", 2000);
+    }
+
+  </script>
 </body>
 </html>
