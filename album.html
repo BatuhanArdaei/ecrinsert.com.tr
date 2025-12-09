@@ -12,7 +12,6 @@
   <style>
     :root {
       --bg-color: #000000;
-      --card-bg: #121212;
       --text-main: #f5f5f5;
       --text-sub: #a8a8a8;
       --border: #262626;
@@ -39,9 +38,7 @@
       background: #000; z-index: 3000;
       display: flex; align-items: center; justify-content: center; flex-direction: column;
     }
-    .auth-box {
-        border: 1px solid var(--border); padding: 40px; width: 350px; text-align: center; border-radius: 8px;
-    }
+    .auth-box { border: 1px solid var(--border); padding: 40px; width: 350px; text-align: center; border-radius: 8px; }
     .logo-font { font-family: 'Grand Hotel', cursive; font-size: 3rem; margin-bottom: 30px; display: block;}
     .input-field {
         width: 100%; background: #121212; border: 1px solid var(--border);
@@ -61,9 +58,7 @@
         border-right: 1px solid var(--border); padding: 20px 12px;
         display: none; flex-direction: column; z-index: 100; background: var(--bg-color);
     }
-    .sidebar-logo {
-        font-family: 'Grand Hotel', cursive; font-size: 2rem; margin-bottom: 40px; padding-left: 12px; display: block;
-    }
+    .sidebar-logo { font-family: 'Grand Hotel', cursive; font-size: 2rem; margin-bottom: 40px; padding-left: 12px; display: block; }
     .sidebar-item {
         padding: 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 15px;
         color: var(--text-main); font-size: 1rem; transition: 0.2s; margin-bottom: 5px; font-weight: 500;
@@ -87,182 +82,150 @@
     #mobile-nav-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid var(--text-main); }
 
     /* İÇERİK ALANI */
-    .content-area {
-        width: 100%; display: flex; justify-content: center;
-        padding-bottom: 60px;
-    }
+    .content-area { width: 100%; display: flex; justify-content: center; padding-bottom: 60px; }
 
-    /* === FEED (AKIŞ) === */
-    .feed-container {
-        width: 100%; max-width: var(--feed-width); padding-top: 10px;
-    }
-    
-    .feed-post { 
-        margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; 
-    }
-    
-    .post-header { 
-        padding: 10px 0; display: flex; align-items: center; justify-content: space-between; 
-    }
+    /* === FEED === */
+    .feed-container { width: 100%; max-width: var(--feed-width); padding-top: 10px; }
+    .feed-post { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+    .post-header { padding: 10px 0; display: flex; align-items: center; justify-content: space-between; }
     .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer;}
     .post-avatar-feed { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
     .post-username { font-weight: 600; font-size: 0.9rem; }
     .verified { color: var(--blue); margin-left: 4px; font-size: 0.8rem; }
-
-    /* GÖNDERİ BOYUT AYARI (4:5 ORAN, SABİT) */
-    .post-image-container {
-        width: 100%;
-        aspect-ratio: 4 / 5; /* Instagram Portre Standardı */
-        overflow: hidden;
-        border-radius: 4px;
-        background: #1a1a1a;
-        border: 1px solid var(--border);
-        cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .post-image { 
-        width: 100%; height: 100%; object-fit: cover; /* Resmi doldurur, taşanı keser */
-    }
-
+    .post-image-container { width: 100%; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 4px; background: #1a1a1a; border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .post-image { width: 100%; height: 100%; object-fit: cover; }
     .post-actions-bar { padding: 10px 0; display: flex; justify-content: space-between; font-size: 1.5rem; }
     .action-left { display: flex; gap: 15px; }
-    
     .post-caption { font-size: 0.9rem; margin-top: 5px;}
     .post-time { font-size: 0.75rem; color: var(--text-sub); margin-top: 5px; }
 
-    /* === PROFİL GÖRÜNÜMÜ === */
-    #profile-view { 
-        display: none; width: 100%; max-width: 935px; padding: 20px 20px 0;
-    }
-    
-    .profile-header {
-        display: flex; margin-bottom: 20px; align-items: center;
-    }
-    .profile-pic-container { 
-        flex: 0 0 90px; margin-right: 20px; display: flex; justify-content: center; 
-    }
-    .profile-pic-large { 
-        width: 80px; height: 80px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 1px solid var(--border);
-    }
-
+    /* === PROFİL === */
+    #profile-view { display: none; width: 100%; max-width: 935px; padding: 20px 20px 0; }
+    .profile-header { display: flex; margin-bottom: 20px; align-items: flex-start; }
+    .profile-pic-container { flex: 0 0 150px; margin-right: 30px; display: flex; justify-content: center; }
+    .profile-pic-large { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 1px solid var(--border); }
     .profile-info { flex: 1; }
-    
-    .profile-title-row { 
-        display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 15px; 
-    }
-    .profile-username { font-size: 1.2rem; font-weight: 400; }
-    
-    .btn-edit-profile {
-        background: var(--button-gray); border: none; color: white;
-        font-weight: 600; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; width: 100%;
-    }
-
-    .profile-stats { display: flex; justify-content: space-between; font-size: 0.9rem; border-top: 1px solid var(--border); padding: 10px 0; }
-    .stat-item { text-align: center; flex: 1; }
-    .stat-num { font-weight: 700; display: block; font-size: 1.1rem;}
-    .stat-label { color: var(--text-main); }
-
-    .profile-bio { font-size: 0.9rem; padding: 0 5px 15px 5px; }
+    .profile-title-row { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+    .profile-username { font-size: 1.3rem; font-weight: 400; }
+    .btn-edit-profile { background: var(--button-gray); border: none; color: white; font-weight: 600; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+    .profile-stats { display: flex; gap: 40px; margin-bottom: 20px; font-size: 1rem; }
+    .stat-num { font-weight: 600; }
+    .profile-bio { font-size: 0.95rem; }
     .bio-name { font-weight: 700; }
+    .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+    .grid-item { position: relative; aspect-ratio: 1/1; cursor: pointer; background: #121212; overflow: hidden; }
+    .grid-item img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s; }
 
-    /* Grid */
-    .profile-tabs { border-top: 1px solid var(--border); display: flex; justify-content: center; height: 45px; align-items: center; color: var(--text-sub); }
-    
-    .profile-grid { 
-        display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; 
-    }
-    .grid-item { 
-        position: relative; aspect-ratio: 1/1; cursor: pointer; background: #121212; 
-        overflow: hidden;
-    }
-    .grid-item img { 
-        width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s; 
-    }
-
-    /* PC Layout Adjustments */
     @media (min-width: 769px) {
         .mobile-top-nav, .mobile-bottom-nav { display: none; }
         .sidebar { display: flex; }
         .content-area { margin-left: var(--sidebar-width); }
-        .profile-header { padding: 0; align-items: flex-start; }
-        .profile-pic-container { flex: 0 0 150px; justify-content: center; margin-right: 30px;}
-        .profile-pic-large { width: 150px; height: 150px; }
-        .profile-title-row { flex-direction: row; align-items: center; }
-        .btn-edit-profile { width: auto; }
-        .profile-stats { border: none; padding: 0; justify-content: flex-start; gap: 40px; margin-bottom: 20px;}
-        .stat-item { text-align: left; flex: none; }
-        .stat-num { display: inline; margin-right: 5px; }
+    }
+    @media (max-width: 768px) {
+        .sidebar { display: none; }
+        .mobile-top-nav, .mobile-bottom-nav { display: flex; }
+        .content-area { margin: 0; width: 100%; }
+        #profile-view { padding: 10px 0; }
+        .profile-header { padding: 0 16px; align-items: center; }
+        .profile-pic-container { flex: 0 0 77px; margin-right: 20px; justify-content: flex-start; }
+        .profile-pic-large { width: 77px; height: 77px; }
+        .profile-title-row { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 10px;}
+        .profile-stats { justify-content: space-around; border-top: 1px solid var(--border); padding: 10px 0; margin-bottom: 0; width: 100%; }
+        .profile-stats li { display: flex; flex-direction: column; align-items: center; }
+        .profile-bio { padding: 0 16px 15px 16px; }
+        .btn-edit-profile { width: 100%; }
     }
 
-    /* === MODALLAR === */
+    /* === POST DETAY MODALI (INSTAGRAM WEB STİLİ) === */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.85); z-index: 2000;
         display: none; justify-content: center; align-items: center;
+        padding: 20px; /* Kenarlardan boşluk */
     }
 
-    /* Upload & Edit Modal */
-    .edit-modal-card { background: #262626; width: 90%; max-width: 400px; border-radius: 12px; overflow: hidden; }
+    .insta-modal-container {
+        display: flex; width: 100%; max-width: 1100px; height: 90vh;
+        background: #000; border-radius: 4px; overflow: hidden;
+        border: 1px solid var(--border); box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    }
+
+    /* Sol Taraf: Resim */
+    .insta-modal-img-box {
+        flex: 1.5; /* Resim daha geniş alan kaplar */
+        background: #000; display: flex; align-items: center; justify-content: center;
+        border-right: 1px solid var(--border);
+    }
+    .insta-modal-img-box img {
+        max-width: 100%; max-height: 100%; object-fit: contain;
+    }
+
+    /* Sağ Taraf: Bilgiler */
+    .insta-modal-info-box {
+        flex: 1; /* Daha dar alan */
+        display: flex; flex-direction: column;
+        background: #000; min-width: 350px; max-width: 450px;
+    }
+
+    /* Header */
+    .insta-modal-header {
+        height: 60px; padding: 0 16px; border-bottom: 1px solid var(--border);
+        display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+
+    /* Yorumlar Alanı (Scrollable) */
+    .insta-modal-comments {
+        flex: 1; overflow-y: auto; padding: 16px;
+        /* Scrollbar gizleme */
+        scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .insta-modal-comments::-webkit-scrollbar { display: none; }
+
+    /* Footer (İkonlar, Beğeni, Tarih, Yorum Yap) */
+    .insta-modal-footer {
+        border-top: 1px solid var(--border); padding: 10px 16px; flex-shrink: 0;
+    }
+    .action-icons { display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 10px; }
+    .likes-count { font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; }
+    .post-date { font-size: 0.7rem; color: var(--text-sub); margin-bottom: 10px; text-transform: uppercase;}
+
+    .add-comment-box {
+        border-top: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; flex-shrink: 0;
+    }
+    .comment-input { flex: 1; background: none; border: none; color: white; outline: none; height: 18px; font-size: 0.9rem; }
+    .post-link { color: var(--blue); font-weight: 600; cursor: pointer; font-size: 0.9rem; opacity: 0.5; }
+    .post-link.active { opacity: 1; }
+
+    /* Yorum Satırı Tasarımı */
+    .comment-row { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+    .comment-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; cursor:pointer;}
+    .comment-content { font-size: 0.9rem; line-height: 1.4; color: var(--text-main); }
+    .comment-username { font-weight: 600; margin-right: 5px; cursor:pointer; }
+    .comment-text { color: var(--text-main); }
+    .comment-meta { font-size: 0.75rem; color: var(--text-sub); margin-top: 4px; display: flex; gap: 10px; }
+
+    /* Mobil uyumluluk için modal */
+    @media (max-width: 768px) {
+        .insta-modal-container { flex-direction: column; height: 100%; border: none; max-width: 100%; }
+        .insta-modal-img-box { flex: none; height: 50vh; border-right: none; border-bottom: 1px solid var(--border); background: #000; }
+        .insta-modal-info-box { flex: 1; min-width: 100%; }
+        .modal-overlay { padding: 0; background: #000; }
+    }
+
+    .close-modal-btn { position: absolute; top: 15px; right: 15px; color: white; font-size: 2rem; cursor: pointer; z-index: 2001; }
+
+    /* DİĞER MODALLAR (UPLOAD, EDIT, MENU) */
+    .upload-modal-card, .edit-modal-card { background: #262626; width: 90%; max-width: 400px; border-radius: 12px; overflow: hidden; }
     .edit-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 600; }
     .edit-body { padding: 20px; display: flex; flex-direction: column; align-items: center; }
     .edit-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border); color: white; padding: 10px 0; margin-bottom: 20px; outline: none; }
-
-    /* Post Modal (Detay) */
-    .post-modal-content {
-        background: #000; max-width: 95vw; height: 90vh;
-        display: flex; flex-direction: column; border-radius: 4px; overflow: hidden;
-        border: 1px solid var(--border); position: relative;
-    }
-    .modal-image-container {
-        background: #000; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden;
-    }
-    .modal-image-container img {
-        max-width: 100%; max-height: 100%; object-fit: contain;
-    }
-    
-    /* Yorum Bölümü */
-    .modal-comments-area {
-        height: 40%; background: #000; border-top: 1px solid var(--border);
-        display: flex; flex-direction: column;
-    }
-    .comments-list {
-        flex: 1; overflow-y: auto; padding: 15px;
-    }
-    .comment-row { display: flex; gap: 10px; margin-bottom: 15px; font-size: 0.9rem; }
-    .comment-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
-    .comment-text { line-height: 1.4; color: #f5f5f5; }
-    .comment-text strong { margin-right: 5px; }
-
-    .comment-input-bar {
-        padding: 10px 15px; border-top: 1px solid var(--border); display: flex; align-items: center;
-    }
-    .comment-input {
-        flex: 1; background: transparent; border: none; color: white; outline: none; padding: 5px;
-    }
-    .post-link { color: var(--blue); font-weight: 600; cursor: pointer; margin-left: 10px; opacity: 0.5; }
-    .post-link.active { opacity: 1; }
-
-    .close-modal-btn {
-        position: absolute; top: 10px; right: 10px; font-size: 1.5rem; color: white; cursor: pointer; text-shadow: 0 0 5px black; z-index: 10;
-    }
-
-    /* HAMBURGER MENU */
-    .menu-sheet {
-        position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.6); z-index: 3000; display: none; justify-content: center; align-items: flex-end; height: 100%;
-    }
+    .menu-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.6); z-index: 3000; display: none; justify-content: center; align-items: flex-end; height: 100%; }
     .menu-list { background: #262626; width: 100%; border-radius: 15px 15px 0 0; overflow: hidden; max-width: 500px;}
     .menu-item { padding: 15px; text-align: center; border-bottom: 1px solid #363636; font-weight: 600; cursor: pointer; }
     .danger { color: var(--danger); }
-
-    /* Upload */
     .file-select { padding: 40px; border: 2px dashed var(--border); border-radius: 15px; cursor: pointer; display: block; margin-bottom: 20px; color: var(--text-sub); text-align: center; }
-    .file-select:hover { border-color: var(--blue); color: var(--blue); }
-    
-    #toast {
-        position: fixed; top: -50px; left: 50%; transform: translateX(-50%);
-        background: #262626; color: white; padding: 10px 20px; border-radius: 5px;
-        z-index: 9999; transition: top 0.3s;
-    }
+
+    #toast { position: fixed; top: -50px; left: 50%; transform: translateX(-50%); background: #262626; color: white; padding: 10px 20px; border-radius: 8px; z-index: 9999; transition: top 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.5); font-weight: 600;}
     .loading-spinner { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display:none; margin: 0 auto;}
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -284,8 +247,7 @@
 
   <!-- 2. APP -->
   <div id="main-app">
-    
-    <!-- SIDEBAR (PC) -->
+    <!-- SIDEBAR -->
     <div class="sidebar">
         <div class="sidebar-logo">Spring</div>
         <div class="sidebar-item" onclick="switchTab('feed')"><i class="fa-solid fa-house"></i> Ana Sayfa</div>
@@ -294,8 +256,7 @@
         <div class="sidebar-item" onclick="goToMyProfile()"><img src="" class="nav-avatar-small" id="pc-nav-avatar"> Profil</div>
         <div class="sidebar-item" style="margin-top:auto;" onclick="document.getElementById('hamburger-menu').style.display='flex'"><i class="fa-solid fa-bars"></i> Daha Fazla</div>
     </div>
-
-    <!-- TOP NAV (Mobil) -->
+    <!-- MOBIL TOP -->
     <div class="mobile-top-nav">
         <span class="nav-logo">Spring</span>
         <div style="display:flex; gap:20px;">
@@ -303,64 +264,99 @@
             <i class="fa-regular fa-paper-plane nav-icon"></i>
         </div>
     </div>
-
-    <!-- İÇERİK -->
+    <!-- IÇERIK -->
     <div class="content-area">
-        
-        <!-- FEED -->
         <div id="feed-view"></div>
-
-        <!-- PROFİL -->
         <div id="profile-view">
             <div class="profile-header">
-                <div class="profile-pic-container">
-                    <img src="" class="profile-pic-large" id="prof-img">
-                </div>
+                <div class="profile-pic-container"><img src="" class="profile-pic-large" id="prof-img"></div>
                 <div class="profile-info">
                     <div class="profile-title-row">
                         <div class="profile-username" id="prof-username">kullaniciadi</div>
                         <button class="btn-edit-profile" id="btn-edit-profile" onclick="openEditProfile()">Profili Düzenle</button>
                         <i class="fa-solid fa-gear nav-icon mobile-hide" style="font-size:1.2rem; cursor:pointer; display:none;" onclick="document.getElementById('hamburger-menu').style.display='flex'"></i>
                     </div>
-                    
                     <div class="profile-stats">
-                        <div class="stat-item"><span class="stat-num" id="prof-posts-count">0</span> <span class="stat-label">gönderi</span></div>
-                        <div class="stat-item"><span class="stat-num">31M</span> <span class="stat-label">takipçi</span></div>
-                        <div class="stat-item"><span class="stat-num">1</span> <span class="stat-label">takip</span></div>
+                        <div class="stat-item"><span class="stat-num" id="prof-posts-count">0</span> gönderi</div>
+                        <div class="stat-item"><span class="stat-num">31M</span> takipçi</div>
+                        <div class="stat-item"><span class="stat-num">1</span> takip</div>
                     </div>
-
-                    <div class="profile-bio">
-                        <div class="bio-name" id="prof-realname">İsim</div>
-                        <div class="bio-text" id="prof-bio">Biyografi</div>
-                    </div>
+                    <div class="profile-bio"><div class="bio-name" id="prof-realname">İsim</div><div class="bio-text" id="prof-bio">Biyografi</div></div>
                 </div>
             </div>
-
-            <div class="profile-tabs">
-                <i class="fa-solid fa-table-cells" style="font-size:1.2rem; color:white;"></i>
+            <div class="profile-bio-area mobile-show" style="padding:0 15px 15px 15px; display:none;" id="mobile-bio-container">
+                <div class="bio-name" id="prof-realname-m">İsim</div>
+                <div class="bio-text" id="prof-bio-m">Biyografi</div>
             </div>
-
+            <div class="profile-tabs"><div class="tab-item active"><i class="fa-solid fa-table-cells"></i> GÖNDERİLER</div></div>
             <div class="profile-grid" id="prof-grid"></div>
         </div>
     </div>
-
-    <!-- BOTTOM NAV (Mobil) -->
+    <!-- MOBIL BOTTOM -->
     <div class="mobile-bottom-nav">
       <i class="fa-solid fa-house nav-icon" onclick="switchTab('feed')"></i>
+      <i class="fa-solid fa-magnifying-glass nav-icon"></i>
       <i class="fa-regular fa-square-plus nav-icon" onclick="openUpload()"></i>
+      <i class="fa-solid fa-clapperboard nav-icon"></i>
       <img src="" id="mobile-nav-avatar" class="nav-avatar-small" onclick="goToMyProfile()">
     </div>
   </div>
 
-  <!-- MODALLAR -->
-  
-  <!-- Upload Modal -->
+  <!-- 3. GÖNDERİ DETAY (YENİLENMİŞ INSTAGRAM WEB UI) -->
+  <div class="modal-overlay" id="post-detail-modal">
+      <div class="close-modal-btn" onclick="document.getElementById('post-detail-modal').style.display='none'">&times;</div>
+      
+      <div class="insta-modal-container">
+          <!-- Sol: Resim -->
+          <div class="insta-modal-img-box">
+              <img src="" id="detail-img">
+          </div>
+          
+          <!-- Sağ: Bilgiler -->
+          <div class="insta-modal-info-box">
+              <!-- Header -->
+              <div class="insta-modal-header">
+                  <div class="user-info" style="cursor:pointer;" id="modal-header-user-click">
+                      <img src="" class="post-avatar-feed" id="modal-header-avatar">
+                      <span class="post-username" style="margin-left:10px;" id="modal-header-username">username</span>
+                  </div>
+                  <i class="fa-solid fa-ellipsis" style="cursor:pointer;" onclick="openOptions(null, null)"></i>
+              </div>
+
+              <!-- Body (Caption + Comments) -->
+              <div class="insta-modal-comments" id="detail-comments-list">
+                  <!-- JS ile dolacak -->
+              </div>
+
+              <!-- Footer -->
+              <div class="insta-modal-footer">
+                  <div class="action-icons">
+                      <div class="action-left">
+                          <i class="fa-regular fa-heart icon-btn"></i>
+                          <i class="fa-regular fa-comment icon-btn"></i>
+                          <i class="fa-regular fa-paper-plane icon-btn"></i>
+                      </div>
+                      <i class="fa-regular fa-bookmark icon-btn"></i>
+                  </div>
+                  <div class="likes-count">10.453 beğenme</div>
+                  <div class="post-date" id="modal-post-date">1 GÜN ÖNCE</div>
+              </div>
+
+              <!-- Input -->
+              <div class="add-comment-box">
+                  <i class="fa-regular fa-face-smile" style="font-size:1.5rem; margin-right:10px; cursor:pointer;"></i>
+                  <input type="text" class="comment-input" id="detail-comment-input" placeholder="Yorum ekle...">
+                  <span class="post-link" id="post-comment-btn" onclick="sendComment()">Paylaş</span>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Diğer Modallar -->
   <div class="modal-overlay" id="upload-modal">
       <div class="edit-modal-card">
           <div class="edit-header">
-              <span onclick="closeModal('upload-modal')" style="cursor:pointer;">İptal</span>
-              <span>Yeni Gönderi</span>
-              <span style="color:var(--blue); cursor:pointer;" onclick="uploadPost()">Paylaş</span>
+              <span onclick="closeModal('upload-modal')" style="cursor:pointer;">İptal</span><span>Yeni Gönderi</span><span style="color:var(--blue); cursor:pointer;" onclick="uploadPost()">Paylaş</span>
           </div>
           <div style="padding:20px;">
               <label for="file-input" class="file-select" id="file-label">Fotoğraf Seç</label>
@@ -372,63 +368,22 @@
       </div>
   </div>
 
-  <!-- Edit Profile Modal -->
   <div class="modal-overlay" id="edit-profile-modal">
       <div class="edit-modal-card">
-          <div class="edit-header">
-              <span onclick="closeModal('edit-profile-modal')" style="cursor:pointer;">İptal</span>
-              <span>Profili Düzenle</span>
-              <span style="color:var(--blue); cursor:pointer;" onclick="saveProfile()">Bitti</span>
-          </div>
+          <div class="edit-header"><span onclick="closeModal('edit-profile-modal')" style="cursor:pointer;">İptal</span><span>Profili Düzenle</span><span style="color:var(--blue); cursor:pointer;" onclick="saveProfile()">Bitti</span></div>
           <div class="edit-body">
               <img src="" id="edit-preview-img" style="width:80px; height:80px; border-radius:50%; margin-bottom:10px; object-fit:cover;">
               <div class="change-photo-btn" style="color:var(--blue); font-weight:600; cursor:pointer;" onclick="document.getElementById('avatar-input').click()">Profil fotoğrafını değiştir</div>
               <input type="file" id="avatar-input" hidden accept="image/*" onchange="previewAvatar(this)">
-              
-              <div style="width:100%; margin-top:20px;">
-                  <label style="color:var(--text-sub); font-size:0.8rem;">Ad</label>
-                  <input type="text" id="edit-name-input" class="input-field" style="background:transparent; border:none; border-bottom:1px solid var(--border);">
-                  <label style="color:var(--text-sub); font-size:0.8rem;">Biyografi</label>
-                  <input type="text" id="edit-bio-input" class="input-field" style="background:transparent; border:none; border-bottom:1px solid var(--border);">
-              </div>
+              <div style="width:100%; margin-top:20px;"><label style="color:var(--text-sub); font-size:0.8rem;">Ad</label><input type="text" id="edit-name-input" class="edit-input"><label style="color:var(--text-sub); font-size:0.8rem;">Biyografi</label><input type="text" id="edit-bio-input" class="edit-input"></div>
           </div>
       </div>
   </div>
 
-  <!-- POST DETAIL MODAL -->
-  <div class="modal-overlay" id="post-detail-modal">
-      <div class="post-modal-content">
-          <div class="close-modal-btn" onclick="document.getElementById('post-detail-modal').style.display='none'">&times;</div>
-          
-          <div class="modal-image-container">
-              <img src="" id="detail-img">
-          </div>
-          
-          <div class="modal-comments-area">
-              <div class="comments-list" id="detail-comments-list">
-                  <!-- Yorumlar -->
-              </div>
-              <div class="comment-input-bar">
-                  <input type="text" class="comment-input" id="detail-comment-input" placeholder="Yorum ekle...">
-                  <span class="post-link" id="post-comment-btn" onclick="sendComment()">Paylaş</span>
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <!-- Hamburger Menu (Sağ Üstten ve Profil) -->
   <div class="menu-sheet" id="hamburger-menu" onclick="this.style.display='none'">
-      <div class="menu-list">
-          <div class="menu-item" onclick="window.location.href='index.html'">Ana Menüye Dön</div>
-          <div class="menu-item danger" onclick="logout()">Çıkış Yap</div>
-          <div class="menu-item" onclick="this.parentElement.parentElement.style.display='none'">İptal</div>
-      </div>
+      <div class="menu-list"><div class="menu-item" onclick="window.location.href='index.html'">Ana Menüye Dön</div><div class="menu-item danger" onclick="logout()">Çıkış Yap</div><div class="menu-item" onclick="this.parentElement.parentElement.style.display='none'">İptal</div></div>
   </div>
-
-  <!-- Options Menu (3 Nokta) -->
-  <div class="menu-sheet" id="options-menu" onclick="this.style.display='none'">
-      <div class="menu-list" id="options-list"></div>
-  </div>
+  <div class="menu-sheet" id="options-menu" onclick="this.style.display='none'"><div class="menu-list" id="options-list"></div></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -450,383 +405,185 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
-
     setPersistence(auth, browserSessionPersistence);
 
-    const SPECIAL_USERS = {
-        "sert43213@gmail.com": { handle: "dteccrn", verified: true, name: "Ecrin" },
-        "batuhanardiin@gmail.com": { handle: "ardab4tu", verified: true, name: "Batuhan" }
-    };
+    const SPECIAL_USERS = { "sert43213@gmail.com": { handle: "dteccrn", verified: true, name: "Ecrin" }, "batuhanardiin@gmail.com": { handle: "ardab4tu", verified: true, name: "Batuhan" } };
+    let currentUser = null; let userProfile = null; let allPosts = []; let currentPostData = null;
 
-    let currentUser = null;
-    let userProfile = null;
-    let allPosts = [];
-    let currentPostData = null;
-
-    // === AUTH ===
     onAuthStateChanged(auth, async (user) => {
-        if(user) {
-            currentUser = user;
-            await loadUserProfile();
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            loadFeed();
-        } else {
-            document.getElementById('auth-screen').style.display = 'flex';
-        }
+        if(user) { currentUser = user; await loadUserProfile(); document.getElementById('auth-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'block'; loadFeed(); }
+        else { document.getElementById('auth-screen').style.display = 'flex'; }
     });
 
-    window.login = () => {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        signInWithEmailAndPassword(auth, email, pass).catch(e => alert(e.message));
-    }
+    window.login = () => { const e = document.getElementById('email').value; const p = document.getElementById('password').value; signInWithEmailAndPassword(auth, e, p).catch(r => alert(r.message)); }
     window.logout = () => signOut(auth).then(() => location.reload());
 
-    // === PROFİL ===
     async function loadUserProfile() {
-        const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            userProfile = docSnap.data();
-        } else {
-            const email = currentUser.email;
-            let handle = email.split('@')[0];
-            let isVerified = false;
-            let name = "Kullanıcı";
-
-            if(SPECIAL_USERS[email]) {
-                handle = SPECIAL_USERS[email].handle;
-                isVerified = SPECIAL_USERS[email].verified;
-                name = SPECIAL_USERS[email].name;
-            }
-
-            userProfile = {
-                username: handle, displayName: name, bio: "",
-                photoURL: "https://via.placeholder.com/150", verified: isVerified
-            };
+        const docRef = doc(db, "users", currentUser.uid); const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) userProfile = docSnap.data();
+        else {
+            const e = currentUser.email; let h = e.split('@')[0], v=false, n="Kullanıcı";
+            if(SPECIAL_USERS[e]) { h=SPECIAL_USERS[e].handle; v=SPECIAL_USERS[e].verified; n=SPECIAL_USERS[e].name; }
+            userProfile = { username: h, displayName: n, bio: "", photoURL: "https://via.placeholder.com/150", verified: v };
             await setDoc(docRef, userProfile);
         }
-        
-        // Avatar güncelle
-        const mobAvatar = document.getElementById('mobile-nav-avatar');
-        const pcAvatar = document.getElementById('pc-nav-avatar');
-        if(mobAvatar) mobAvatar.src = userProfile.photoURL;
-        if(pcAvatar) pcAvatar.src = userProfile.photoURL;
+        document.getElementById('mobile-nav-avatar').src = userProfile.photoURL; document.getElementById('pc-nav-avatar').src = userProfile.photoURL;
     }
 
     window.goToMyProfile = () => switchTab('profile', currentUser.uid);
 
     window.switchTab = async (tab, uid = null) => {
-        document.getElementById('feed-view').style.display = 'none';
-        document.getElementById('profile-view').style.display = 'none';
-        
-        if (tab === 'feed') {
-            document.getElementById('feed-view').style.display = 'block';
-        } else if (tab === 'profile') {
+        document.getElementById('feed-view').style.display = 'none'; document.getElementById('profile-view').style.display = 'none';
+        if(tab === 'feed') document.getElementById('feed-view').style.display = 'block';
+        else if (tab === 'profile') {
             document.getElementById('profile-view').style.display = 'block';
-            
-            // Temizlik (Dupe önleme)
-            document.getElementById('prof-grid').innerHTML = "";
-
-            let targetUser = userProfile;
-            let isMe = (uid === currentUser.uid);
-
+            let targetUser = userProfile; let isMe = (uid === currentUser.uid);
             if(!isMe) {
                 const found = allPosts.find(p => p.uid === uid);
                 if(found) targetUser = { username: found.username, displayName: found.username, photoURL: found.userPhoto, verified: found.verified, bio: "..." };
             }
-
             document.getElementById('prof-img').src = targetUser.photoURL;
             document.getElementById('prof-username').innerHTML = `${targetUser.username} ${targetUser.verified ? '<i class="fa-solid fa-circle-check verified"></i>' : ''}`;
-            document.getElementById('prof-realname').innerText = targetUser.displayName;
-            document.getElementById('prof-bio').innerText = targetUser.bio || "";
-            
+            document.getElementById('prof-realname').innerText = targetUser.displayName; document.getElementById('prof-bio').innerText = targetUser.bio || "";
+            if(window.innerWidth <= 768) { document.getElementById('mobile-bio-container').style.display='block'; document.getElementById('prof-realname-m').innerText = targetUser.displayName; document.getElementById('prof-bio-m').innerText = targetUser.bio || ""; }
             document.getElementById('btn-edit-profile').style.display = isMe ? 'block' : 'none';
-
-            // Grid
-            const grid = document.getElementById('prof-grid');
-            const userPosts = allPosts.filter(p => p.uid === uid);
-            document.getElementById('prof-posts-count').innerText = userPosts.length;
-
+            const grid = document.getElementById('prof-grid'); grid.innerHTML = "";
+            const userPosts = allPosts.filter(p => p.uid === uid); document.getElementById('prof-posts-count').innerText = userPosts.length;
             userPosts.forEach(post => {
-                const div = document.createElement('div');
-                div.className = 'grid-item';
-                div.innerHTML = `<img src="${post.url}" loading="lazy">`;
-                div.onclick = () => openDetail(post);
-                grid.appendChild(div);
+                const div = document.createElement('div'); div.className = 'grid-item'; div.innerHTML = `<img src="${post.url}" loading="lazy">`;
+                div.onclick = () => openDetail(post); grid.appendChild(div);
             });
         }
     }
 
-    // === FEED ===
     function loadFeed() {
         const q = query(collection(db, "photos"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
-            allPosts = [];
-            const container = document.getElementById('feed-view');
-            container.innerHTML = "";
-            
+            allPosts = []; const container = document.getElementById('feed-view'); container.innerHTML = "";
             snapshot.forEach(doc => {
-                const data = { id: doc.id, ...doc.data() };
-                allPosts.push(data);
-                
-                const div = document.createElement('div');
-                div.className = 'feed-post';
+                const data = { id: doc.id, ...doc.data() }; allPosts.push(data);
+                const div = document.createElement('div'); div.className = 'feed-post';
                 const verify = data.verified ? '<i class="fa-solid fa-circle-check verified"></i>' : '';
-                
                 div.innerHTML = `
-                    <div class="post-header">
-                        <div class="user-info" onclick="switchTab('profile', '${data.uid}')">
-                            <img src="${data.userPhoto}" class="post-avatar-feed">
-                            <span class="post-username" style="margin-left:10px;">${data.username}</span>
-                            ${verify}
-                        </div>
-                        <i class="fa-solid fa-ellipsis" style="cursor:pointer;" onclick="openOptions('${data.id}', '${data.uid}')"></i>
-                    </div>
-                    
-                    <div class="post-image-container">
-                        <img src="${data.url}" class="post-image" onclick="openDetailById('${data.id}')">
-                    </div>
-                    
-                    <div class="post-actions-bar">
-                        <div class="action-left">
-                            <i class="fa-regular fa-heart nav-icon"></i>
-                            <i class="fa-regular fa-comment nav-icon" onclick="openDetailById('${data.id}')"></i>
-                            <i class="fa-regular fa-paper-plane nav-icon"></i>
-                        </div>
-                        <i class="fa-regular fa-bookmark nav-icon" onclick="downloadImage('${data.url}')"></i>
-                    </div>
-                    <div class="post-details">
-                        <div class="post-caption"><span style="font-weight:600;">${data.username}</span> ${data.caption}</div>
-                    </div>
+                    <div class="post-header"><div class="user-info" onclick="switchTab('profile', '${data.uid}')"><img src="${data.userPhoto}" class="post-avatar-feed"><span class="post-username" style="margin-left:10px;">${data.username}</span>${verify}</div><i class="fa-solid fa-ellipsis" style="cursor:pointer;" onclick="openOptions('${data.id}', '${data.uid}')"></i></div>
+                    <div class="post-image-container"><img src="${data.url}" class="post-image" onclick="openDetailById('${data.id}')"></div>
+                    <div class="post-actions-bar"><div class="action-left"><i class="fa-regular fa-heart icon-btn"></i><i class="fa-regular fa-comment icon-btn" onclick="openDetailById('${data.id}')"></i><i class="fa-regular fa-paper-plane icon-btn"></i></div><i class="fa-regular fa-bookmark icon-btn" onclick="downloadImage('${data.url}')"></i></div>
+                    <div class="post-details"><div class="post-caption"><span style="font-weight:600;">${data.username}</span> ${data.caption}</div><div class="post-time">${new Date(data.createdAt).toLocaleDateString()}</div></div>
                 `;
                 container.appendChild(div);
             });
         });
     }
 
-    // === DETAY MODAL ===
-    window.openDetailById = (id) => {
-        const post = allPosts.find(p => p.id === id);
-        if(post) openDetail(post);
-    }
-
+    window.openDetailById = (id) => { const p = allPosts.find(x => x.id === id); if(p) openDetail(p); }
     window.openDetail = (post) => {
         currentPostData = post;
         document.getElementById('detail-img').src = post.url;
+        document.getElementById('modal-header-avatar').src = post.userPhoto;
+        document.getElementById('modal-header-username').innerHTML = `${post.username} ${post.verified ? '<i class="fa-solid fa-circle-check verified"></i>' : ''}`;
+        document.getElementById('modal-post-date').innerText = new Date(post.createdAt).toLocaleDateString('tr-TR', { day:'numeric', month:'long' }).toUpperCase();
+
+        // Header click to profile
+        document.getElementById('modal-header-user-click').onclick = () => { document.getElementById('post-detail-modal').style.display = 'none'; switchTab('profile', post.uid); };
+
+        const list = document.getElementById('detail-comments-list');
+        list.innerHTML = "";
         
-        const commentsList = document.getElementById('detail-comments-list');
-        commentsList.innerHTML = "";
-        
-        // Caption'ı ilk yorum gibi ekle
-        const verify = post.verified ? '<i class="fa-solid fa-circle-check verified" style="font-size:0.8rem;"></i>' : '';
-        commentsList.innerHTML += `
+        // Caption (İlk yorum)
+        list.innerHTML += `
             <div class="comment-row">
-                <img src="${post.userPhoto}" class="comment-avatar">
-                <div class="comment-text">
-                    <strong>${post.username} ${verify}</strong> ${post.caption}
+                <img src="${post.userPhoto}" class="comment-avatar" onclick="switchTab('profile','${post.uid}'); closeModal('post-detail-modal')">
+                <div class="comment-content">
+                    <span class="comment-username" onclick="switchTab('profile','${post.uid}'); closeModal('post-detail-modal')">${post.username} ${post.verified ? '<i class="fa-solid fa-circle-check verified" style="font-size:0.8rem;"></i>' : ''}</span>
+                    <span class="comment-text">${post.caption}</span>
+                    <div class="comment-meta">1h</div>
                 </div>
             </div>
         `;
 
-        // Diğer yorumlar
         if(post.comments) {
             post.comments.forEach(c => {
                  const v = c.verified ? '<i class="fa-solid fa-circle-check verified" style="font-size:0.8rem;"></i>' : '';
-                 commentsList.innerHTML += `
+                 list.innerHTML += `
                     <div class="comment-row">
-                        <img src="${c.photo}" class="comment-avatar">
-                        <div class="comment-text">
-                            <strong>${c.username} ${v}</strong> ${c.text}
+                        <img src="${c.photo}" class="comment-avatar" onclick="switchTab('profile','${c.uid}'); closeModal('post-detail-modal')">
+                        <div class="comment-content">
+                            <span class="comment-username" onclick="switchTab('profile','${c.uid}'); closeModal('post-detail-modal')">${c.username} ${v}</span>
+                            <span class="comment-text">${c.text}</span>
+                            <div class="comment-meta">Yanıtla</div>
                         </div>
                     </div>
                  `;
             });
         }
-
         document.getElementById('post-detail-modal').style.display = 'flex';
     }
 
-    // === YORUM EKLEME ===
-    document.getElementById('detail-comment-input').addEventListener('input', function() {
-        const btn = document.getElementById('post-comment-btn');
-        if(this.value.trim().length > 0) btn.classList.add('active');
-        else btn.classList.remove('active');
-    });
-
-    window.sendComment = async () => {
-        const input = document.getElementById('detail-comment-input');
-        const text = input.value.trim();
-        if(!text) return;
-
-        const newComment = {
-            uid: currentUser.uid,
-            username: userProfile.username,
-            photo: userProfile.photoURL,
-            verified: userProfile.verified,
-            text: text,
-            createdAt: Date.now()
-        };
-
-        const postRef = doc(db, "photos", currentPostData.id);
-        await updateDoc(postRef, { comments: arrayUnion(newComment) });
-        input.value = "";
-        
-        // UI Güncelle (Snapshot beklemeden)
-        const commentsList = document.getElementById('detail-comments-list');
-        const v = newComment.verified ? '<i class="fa-solid fa-circle-check verified" style="font-size:0.8rem;"></i>' : '';
-        commentsList.innerHTML += `
-            <div class="comment-row">
-                <img src="${newComment.photo}" class="comment-avatar">
-                <div class="comment-text">
-                    <strong>${newComment.username} ${v}</strong> ${newComment.text}
-                </div>
-            </div>
-        `;
-        commentsList.scrollTop = commentsList.scrollHeight;
-    }
-
-    // === OPTIONS (3 NOKTA) ===
+    // === OPTIONS & ACTIONS ===
     window.openOptions = (id, uid) => {
-        // Eğer Feed'den çağrıldıysa ID gelir, Modal'dan çağrıldıysa currentPostData'dan alır
-        if(id) currentPostData = allPosts.find(p => p.id === id);
-        
+        if(id) currentPostData = allPosts.find(p => p.id === id); // Feed'den geldiyse
         const menu = document.getElementById('options-menu');
         const list = document.getElementById('options-list');
         list.innerHTML = "";
-
         const isOwner = (currentPostData.uid === currentUser.uid);
-        
-        if(isOwner) {
-            list.innerHTML += `<div class="menu-item danger" onclick="deletePost()">Sil</div>`;
-            list.innerHTML += `<div class="menu-item">Düzenle</div>`;
-        }
-        
-        list.innerHTML += `<div class="menu-item" onclick="shareUrl()">Paylaş</div>`;
-        list.innerHTML += `<div class="menu-item" onclick="downloadImage('${currentPostData.url}')">İndir</div>`;
-        list.innerHTML += `<div class="menu-item" onclick="document.getElementById('options-menu').style.display='none'">İptal</div>`;
-
+        if(isOwner) list.innerHTML += `<div class="menu-item danger" onclick="deletePost()">Sil</div><div class="menu-item">Düzenle</div>`;
+        list.innerHTML += `<div class="menu-item" onclick="shareUrl()">Paylaş</div><div class="menu-item" onclick="downloadImage('${currentPostData.url}')">İndir</div><div class="menu-item" onclick="document.getElementById('options-menu').style.display='none'">İptal</div>`;
         menu.style.display = 'flex';
     }
-
-    window.deletePost = async () => {
-        if(!confirm("Silinecek?")) return;
-        try {
-            await deleteObject(ref(storage, currentPostData.storageRef));
-            await deleteDoc(doc(db, "photos", currentPostData.id));
-            document.getElementById('options-menu').style.display = 'none';
-            document.getElementById('post-detail-modal').style.display = 'none';
-            showToast("Silindi");
-        } catch(e) { console.log(e); }
-    }
-
-    window.downloadImage = async (url) => {
-        try {
-            const blob = await fetch(url).then(r => r.blob());
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Spring_${Date.now()}.jpg`;
-            link.click();
-        } catch(e) { alert("İndirme Hatası"); }
-    }
-
-    window.shareUrl = () => {
-        navigator.clipboard.writeText(window.location.href);
-        showToast("Link Kopyalandı");
-        document.getElementById('options-menu').style.display = 'none';
-    }
-
-    // === UPLOAD & PROFILE EDIT ===
+    window.deletePost = async () => { if(!confirm("Silinecek?")) return; await deleteObject(ref(storage, currentPostData.storageRef)); await deleteDoc(doc(db, "photos", currentPostData.id)); document.getElementById('options-menu').style.display = 'none'; document.getElementById('post-detail-modal').style.display = 'none'; showToast("Silindi"); }
+    window.downloadImage = async (url) => { try { const blob = await fetch(url).then(r=>r.blob()); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `Spring_${Date.now()}.jpg`; link.click(); } catch(e){ alert("Hata"); } }
+    window.shareUrl = () => { navigator.clipboard.writeText(window.location.href); showToast("Link Kopyalandı"); document.getElementById('options-menu').style.display = 'none'; }
+    
+    // === UPLOAD & EDIT ===
     window.openUpload = () => document.getElementById('upload-modal').style.display = 'flex';
     window.closeModal = (id) => document.getElementById(id).style.display = 'none';
-
-    window.previewUpload = (input) => {
-        if(input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('upload-preview').src = e.target.result;
-                document.getElementById('upload-preview').style.display = 'block';
-                document.getElementById('file-label').style.display = 'none';
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
+    window.previewUpload = (input) => { if(input.files && input.files[0]) { const r = new FileReader(); r.onload = (e) => { document.getElementById('upload-preview').src = e.target.result; document.getElementById('upload-preview').style.display = 'block'; document.getElementById('file-label').style.display = 'none'; }; r.readAsDataURL(input.files[0]); } }
     window.uploadPost = () => {
         const file = document.getElementById('file-input').files[0];
-        const caption = document.getElementById('upload-caption').value;
         if(!file) return alert("Seç");
-        
         document.getElementById('upload-spinner').style.display = 'block';
-        
         const storageRef = ref(storage, 'posts/' + Date.now() + file.name);
         const uploadTask = uploadBytesResumable(storageRef, file);
         uploadTask.on('state_changed', null, null, async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             await addDoc(collection(db, "photos"), {
-                url, caption,
-                uid: currentUser.uid,
-                username: userProfile.username,
-                userPhoto: userProfile.photoURL,
-                verified: userProfile.verified,
-                storageRef: uploadTask.snapshot.ref.fullPath,
-                createdAt: Date.now(),
-                comments: []
+                url, caption: document.getElementById('upload-caption').value, uid: currentUser.uid, username: userProfile.username, userPhoto: userProfile.photoURL, verified: userProfile.verified, storageRef: uploadTask.snapshot.ref.fullPath, createdAt: Date.now(), comments: []
             });
-            document.getElementById('upload-spinner').style.display = 'none';
-            closeModal('upload-modal');
-            
-            // Temizlik
-            document.getElementById('file-input').value = "";
-            document.getElementById('upload-caption').value = "";
-            document.getElementById('upload-preview').style.display = 'none';
-            document.getElementById('file-label').style.display = 'block';
+            document.getElementById('upload-spinner').style.display = 'none'; closeModal('upload-modal');
+            document.getElementById('file-input').value = ""; document.getElementById('upload-caption').value = ""; document.getElementById('upload-preview').style.display = 'none'; document.getElementById('file-label').style.display = 'block';
             showToast("Paylaşıldı!");
         });
     }
 
-    window.openEditProfile = () => {
-        document.getElementById('edit-name-input').value = userProfile.displayName;
-        document.getElementById('edit-bio-input').value = userProfile.bio || "";
-        document.getElementById('edit-preview-img').src = userProfile.photoURL;
-        document.getElementById('edit-profile-modal').style.display = 'flex';
-    }
-
-    window.previewAvatar = (input) => {
-        if(input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => document.getElementById('edit-preview-img').src = e.target.result;
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    window.saveProfile = async () => {
-        const newName = document.getElementById('edit-name-input').value;
-        const newBio = document.getElementById('edit-bio-input').value;
-        const file = document.getElementById('avatar-input').files[0];
-
-        if(file) {
-            const storageRef = ref(storage, 'avatars/' + currentUser.uid);
-            const uploadTask = await uploadBytesResumable(storageRef, file);
-            userProfile.photoURL = await getDownloadURL(uploadTask.ref);
-        }
-
-        userProfile.displayName = newName;
-        userProfile.bio = newBio;
-        await updateDoc(doc(db, "users", currentUser.uid), userProfile);
+    // === YORUM ===
+    window.sendComment = async () => {
+        const input = document.getElementById('detail-comment-input');
+        const text = input.value.trim();
+        if(!text) return;
+        const newComment = { uid: currentUser.uid, username: userProfile.username, photo: userProfile.photoURL, verified: userProfile.verified, text: text, createdAt: Date.now() };
+        await updateDoc(doc(db, "photos", currentPostData.id), { comments: arrayUnion(newComment) });
+        input.value = "";
         
-        loadUserProfile();
-        goToMyProfile();
-        closeModal('edit-profile-modal');
+        // UI Hızlı Güncelleme
+        const list = document.getElementById('detail-comments-list');
+        const v = newComment.verified ? '<i class="fa-solid fa-circle-check verified" style="font-size:0.8rem;"></i>' : '';
+        list.innerHTML += `<div class="comment-row"><img src="${newComment.photo}" class="comment-avatar"><div class="comment-content"><span class="comment-username">${newComment.username} ${v}</span><span class="comment-text">${newComment.text}</span><div class="comment-meta">Şimdi</div></div></div>`;
+        list.scrollTop = list.scrollHeight;
+    }
+    document.getElementById('detail-comment-input').addEventListener('input', function() { const btn = document.getElementById('post-comment-btn'); if(this.value.trim().length > 0) { btn.classList.add('active'); btn.style.opacity='1'; } else { btn.classList.remove('active'); btn.style.opacity='0.5'; } });
+
+    // === PROFILE EDIT ===
+    window.openEditProfile = () => { document.getElementById('edit-name-input').value = userProfile.displayName; document.getElementById('edit-bio-input').value = userProfile.bio || ""; document.getElementById('edit-preview-img').src = userProfile.photoURL; document.getElementById('edit-profile-modal').style.display = 'flex'; }
+    window.previewAvatar = (input) => { if(input.files[0]) { const r = new FileReader(); r.onload = (e) => document.getElementById('edit-preview-img').src = e.target.result; r.readAsDataURL(input.files[0]); } }
+    window.saveProfile = async () => {
+        const newName = document.getElementById('edit-name-input').value; const newBio = document.getElementById('edit-bio-input').value; const file = document.getElementById('avatar-input').files[0];
+        if(file) { const sRef = ref(storage, 'avatars/'+currentUser.uid); const uTask = await uploadBytesResumable(sRef, file); userProfile.photoURL = await getDownloadURL(uTask.ref); }
+        userProfile.displayName = newName; userProfile.bio = newBio;
+        await updateDoc(doc(db, "users", currentUser.uid), userProfile);
+        loadUserProfile(); goToMyProfile(); closeModal('edit-profile-modal'); showToast("Kaydedildi");
     }
 
-    window.showToast = (msg) => {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.style.top = "20px";
-        setTimeout(() => t.style.top = "-50px", 2000);
-    }
+    window.showToast = (msg) => { const t = document.getElementById('toast'); t.innerText = msg; t.style.top = "20px"; setTimeout(() => t.style.top = "-50px", 2000); }
   </script>
 </body>
 </html>
