@@ -4,13 +4,12 @@
   <meta charset="UTF-8" />
   <title>Ecrin & Batuhan - Özel Alan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <!-- Sevimli, yuvarlak hatlı bir font -->
-  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Fontlar -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&family=Grand+Hotel&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --primary: #ff9a9e;
-      --secondary: #fad0c4;
       --glass: rgba(255, 255, 255, 0.25);
       --glass-border: rgba(255, 255, 255, 0.5);
       --text: #6b4c4c;
@@ -24,38 +23,24 @@
       font-family: 'Quicksand', sans-serif;
       background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
       background: radial-gradient(circle at center, #ffdde1, #ee9ca7);
-      overflow: hidden; /* Kaydırmayı engelle, canvaslar halledecek */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       color: var(--text);
     }
 
-    /* === ARKA PLAN CANVASLARI === */
-    #bgCanvas, #capyCanvas {
-      position: fixed;
-      left: 0;
-      pointer-events: none;
-    }
+    /* === CANVAS === */
+    #bgCanvas, #capyCanvas { position: fixed; left: 0; pointer-events: none; }
     #bgCanvas { top: 0; width: 100%; height: 100%; z-index: 0; }
     #capyCanvas { bottom: 0; width: 100%; height: 140px; z-index: 1; }
 
-    /* === ANA KAPLAYICI (Glassmorphism) === */
+    /* === GİRİŞ & MENÜ KARTLARI === */
     .container {
-      position: relative;
-      z-index: 10;
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 40px;
-      width: 90%;
-      max-width: 400px;
+      position: relative; z-index: 10;
+      background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border); border-radius: 24px;
+      padding: 40px; width: 90%; max-width: 420px; /* Biraz genişlettik */
       box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-      text-align: center;
-      transition: all 0.5s ease;
+      text-align: center; transition: all 0.5s ease;
       animation: float 6s ease-in-out infinite;
     }
 
@@ -64,491 +49,246 @@
       50% { transform: translateY(-10px); }
     }
 
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
-      font-weight: 700;
-      color: #fff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    p.subtitle {
-      color: rgba(255,255,255,0.9);
-      margin-bottom: 30px;
-      font-size: 0.95rem;
-    }
+    h1 { font-size: 1.8rem; margin-bottom: 10px; font-weight: 700; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    p.subtitle { color: rgba(255,255,255,0.9); margin-bottom: 30px; font-size: 0.95rem; }
 
-    /* === PIN GİRİŞİ === */
-    .pin-wrapper {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
+    /* === PIN === */
+    .pin-wrapper { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
     .pin-box {
-      width: 55px;
-      height: 65px;
-      border-radius: 12px;
-      border: 2px solid rgba(255,255,255,0.5);
-      background: rgba(255,255,255,0.3);
-      font-size: 2rem;
-      text-align: center;
-      color: #fff;
-      font-weight: bold;
-      outline: none;
-      transition: all 0.3s;
-      /* Şifre gizleme noktaları için */
-      -webkit-text-security: disc; 
+      width: 55px; height: 65px; border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.3);
+      font-size: 2rem; text-align: center; color: #fff; font-weight: bold; outline: none;
+      transition: all 0.3s; -webkit-text-security: disc; 
     }
+    .pin-box:focus { border-color: #fff; background: rgba(255,255,255,0.5); transform: scale(1.05); box-shadow: 0 0 15px rgba(255,255,255,0.6); }
+    
+    .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--error) !important; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
-    .pin-box:focus {
-      border-color: #fff;
-      background: rgba(255,255,255,0.5);
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(255,255,255,0.6);
-    }
+    #status-msg { height: 20px; font-size: 0.9rem; font-weight: 600; color: #fff; margin-top: 10px; opacity: 0; transition: opacity 0.3s; }
 
-    /* Hata Animasyonu (Titreme) */
-    .shake {
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-      border-color: var(--error) !important;
-    }
-
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
-
-    #status-msg {
-      height: 20px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #fff;
-      margin-top: 10px;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    /* === MENÜ (Girişten Sonra) === */
-    #menu-content {
-      display: none; /* Başlangıçta gizli */
-      text-align: center;
-    }
+    /* === MENÜ (GRID) === */
+    #menu-content { display: none; text-align: center; }
 
     .menu-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 20px;
+      grid-template-columns: 1fr 1fr; /* 2 Sütunlu Grid */
+      gap: 15px; margin-top: 20px;
     }
 
     .menu-item {
-      background: rgba(255,255,255,0.6);
-      padding: 20px 10px;
-      border-radius: 16px;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 700;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      background: rgba(255,255,255,0.6); padding: 15px 10px;
+      border-radius: 16px; text-decoration: none; color: var(--text);
+      font-weight: 700; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      aspect-ratio: 1.5 / 1; /* Hepsi eşit boyutta olsun */
     }
 
-    .menu-item span { font-size: 1.8rem; } 
+    .menu-item span { font-size: 1.8rem; }
+    .menu-item:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4); color: #ff7eb3; }
 
-    .menu-item:hover {
-      transform: translateY(-5px);
-      background: #fff;
-      box-shadow: 0 10px 25px rgba(255, 154, 158, 0.4);
-      color: #ff7eb3;
+    /* ÖZEL BUTONLAR */
+    .menu-item.minecraft { background: linear-gradient(135deg, rgba(200, 255, 220, 0.7), rgba(255, 255, 255, 0.9)); }
+    
+    .menu-item.spring span { 
+        font-family: 'Grand Hotel', cursive; font-size: 2.2rem; display: block; margin-top: -5px;
+    }
+    .menu-item.spring { 
+        background: linear-gradient(135deg, rgba(255, 235, 245, 0.8), rgba(255, 255, 255, 0.9));
     }
 
-    /* MINECRAFT BUTONU İÇİN ÖZEL STİL */
-    .menu-item.minecraft {
-      grid-column: span 2; /* İki sütunu kaplasın */
-      background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(200, 240, 255, 0.6));
-      border: 2px solid rgba(255,255,255,0.9);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .menu-item.minecraft:hover {
-      box-shadow: 0 0 25px rgba(135, 206, 235, 0.6); /* Mavi elmas parıltısı */
-      transform: translateY(-3px) scale(1.02);
-    }
-
-    .menu-item.minecraft span {
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    /* === DUYURU POPUP (YENİ) === */
+    /* === POPUP === */
     #welcome-popup {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.5); /* Arka planı karart */
-      backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999; /* En üstte */
-      opacity: 0;
-      pointer-events: none; /* Görünmezken tıklanmasın */
-      transition: opacity 0.4s ease;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
     }
-
-    #welcome-popup.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    #welcome-popup.show { opacity: 1; pointer-events: auto; }
 
     .popup-content {
       background: linear-gradient(135deg, #fff 0%, #fff5f7 100%);
-      padding: 30px;
-      border-radius: 25px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      position: relative;
+      padding: 30px; border-radius: 25px; width: 90%; max-width: 400px;
+      text-align: center; position: relative;
       box-shadow: 0 25px 50px rgba(0,0,0,0.2);
       border: 2px solid rgba(255, 154, 158, 0.3);
-      transform: scale(0.8);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform: scale(0.8); transition: transform 0.4s;
     }
+    #welcome-popup.show .popup-content { transform: scale(1); }
 
-    #welcome-popup.show .popup-content {
-      transform: scale(1);
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 15px; right: 15px;
-      width: 30px; height: 30px;
-      background: #eee;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      font-weight: bold; color: #888;
-      transition: 0.2s;
-    }
-    .close-btn:hover {
-      background: #ff6b6b; color: white;
-    }
-
-    .popup-emoji { font-size: 3rem; margin-bottom: 15px; display: block; }
-    .popup-title { color: #ff6b81; font-size: 1.5rem; margin-bottom: 15px; font-weight: 800; line-height: 1.3; }
+    .close-btn { position: absolute; top: 15px; right: 15px; cursor: pointer; font-weight: bold; color: #888; font-size: 1.2rem;}
     .popup-btn {
-      background: linear-gradient(45deg, #ff9a9e, #fad0c4);
-      border: none;
-      padding: 12px 30px;
-      border-radius: 30px;
-      color: white;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 10px;
-      box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
-      transition: 0.3s;
-    }
-    .popup-btn:hover { transform: scale(1.05); }
-
-    /* === FOOTER === */
-    footer {
-      position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.8);
-      z-index: 10;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      pointer-events: none; 
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4); border: none; padding: 12px 30px;
+      border-radius: 30px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px;
     }
 
-    /* Mobil Düzenlemeler */
-    @media (max-width: 380px) {
-      .pin-box { width: 45px; height: 55px; font-size: 1.5rem; }
-      .container { padding: 30px 20px; }
-    }
+    footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.8); z-index: 10; pointer-events: none; }
+
+    @media (max-width: 380px) { .pin-box { width: 45px; height: 55px; font-size: 1.5rem; } .container { padding: 30px 20px; } }
   </style>
 </head>
 <body>
 
-  <!-- Arka plan: Uçuşan Kalpler -->
   <canvas id="bgCanvas"></canvas>
-  <!-- Alt kısım: Yürüyen Kapibara -->
   <canvas id="capyCanvas"></canvas>
 
-  <!-- DUYURU POPUP (GİRİŞTE AÇILIR) -->
+  <!-- POPUP -->
   <div id="welcome-popup">
     <div class="popup-content">
       <div class="close-btn" onclick="closePopup()">✕</div>
-      <span class="popup-emoji">✨🎉✨</span>
-      <h2 class="popup-title">YENİLENEN TASARIMI VE YENİLENEN OYUNLARI İLE HİZMETİNDE SEVGİLİM</h2>
+      <span style="font-size:3rem; display:block; margin-bottom:15px;">✨🎉✨</span>
+      <h2 style="color:#ff6b81; font-size:1.5rem; margin-bottom:15px;">YENİLENEN TASARIMI VE YENİLENEN OYUNLARI İLE HİZMETİNDE SEVGİLİM</h2>
       <button class="popup-btn" onclick="closePopup()">Hemen Keşfet 💖</button>
     </div>
   </div>
 
-  <!-- İÇERİK ALANI -->
   <div class="container" id="main-card">
     
-    <!-- 1. EKRAN: PIN GİRİŞ -->
+    <!-- PIN EKRANI -->
     <div id="pin-screen">
       <h1>Hoş Geldin 💖</h1>
       <p class="subtitle">Giriş yapmak için şifremizi gir</p>
       
-      <div class="pin-wrapper" id="pin-inputs">
+      <div class="pin-wrapper">
         <input type="tel" maxlength="1" class="pin-box" pattern="[0-9]*" inputmode="numeric">
         <input type="tel" maxlength="1" class="pin-box" pattern="[0-9]*" inputmode="numeric">
         <input type="tel" maxlength="1" class="pin-box" pattern="[0-9]*" inputmode="numeric">
         <input type="tel" maxlength="1" class="pin-box" pattern="[0-9]*" inputmode="numeric">
       </div>
-      
       <div id="status-msg">Hatalı şifre, tekrar dene aşkım</div>
     </div>
 
-    <!-- 2. EKRAN: MENÜ -->
+    <!-- MENÜ -->
     <div id="menu-content">
       <h1>Canım Sevgilim</h1>
       <p class="subtitle">Sana özel hazırladığım dünya</p>
       
       <div class="menu-grid">
+        <!-- 1. Müzik -->
         <a href="/muzik-oneri.html" class="menu-item">
           <span>🎶</span> Müzik Öneri
         </a>
-        <a href="/oyunlar/puzzle.html" class="menu-item">
+        
+        <!-- 2. Puzzle -->
+        <a href="/puzzle.html" class="menu-item">
           <span>🧩</span> Puzzle
         </a>
+        
+        <!-- 3. Kapibara Oyunu -->
         <a href="/oyun.html" class="menu-item">
           <span>🐾</span> Kapibara
         </a>
+        
+        <!-- 4. Notlar -->
         <a href="/notlar.html" class="menu-item">
           <span>💌</span> Notlar
         </a>
         
-        <!-- YENİ EKLENEN MINECRAFT BUTONU -->
+        <!-- 5. Minecraft (Dünya) -->
         <a href="/minecraft.html" class="menu-item minecraft">
-          <span>🌍</span> Ecrin'in Dünyası
+          <span>🌍</span> Dünya
         </a>
 
+        <!-- 6. Spring (Instagram) -->
+        <a href="/album.html" class="menu-item spring">
+          <span>Spring</span> <!-- Instagram Fontuyla -->
+        </a>
       </div>
     </div>
 
   </div>
 
-  <footer>
-    BatuhanArda tarafından Dünyalar Güzeli Sevgilisi Ecrin'e hazırlanmıştır 💖
-  </footer>
+  <footer>BatuhanArda tarafından Dünyalar Güzeli Sevgilisi Ecrin'e hazırlanmıştır 💖</footer>
 
   <script>
-    /* ================= POPUP LOGIC ================= */
-    // Sayfa yüklendiğinde popup'ı göster
-    window.addEventListener('load', () => {
-      const popup = document.getElementById('welcome-popup');
-      setTimeout(() => {
-        popup.classList.add('show');
-      }, 500); // Yarım saniye gecikmeli gelsin, havalı dursun
-    });
+    /* === POPUP === */
+    window.addEventListener('load', () => { setTimeout(() => document.getElementById('welcome-popup').classList.add('show'), 500); });
+    function closePopup() { const p = document.getElementById('welcome-popup'); p.classList.remove('show'); setTimeout(()=>p.style.display='none', 400); }
 
-    function closePopup() {
-      const popup = document.getElementById('welcome-popup');
-      popup.classList.remove('show');
-      // Animasyon bitince tamamen gizlemek için (opsiyonel ama temiz)
-      setTimeout(() => { popup.style.display = 'none'; }, 400);
-    }
-
-
-    /* ================= PIN LOGIC ================= */
-    const correctPin = "2007"; // Şifren
+    /* === PIN SYSTEM === */
+    const correctPin = "2007";
     const inputs = document.querySelectorAll('.pin-box');
-    const pinScreen = document.getElementById('pin-screen');
-    const menuContent = document.getElementById('menu-content');
-    const statusMsg = document.getElementById('status-msg');
-    const mainCard = document.getElementById('main-card');
-
-    // Daha önce girildiyse direkt aç
-    if(localStorage.getItem('pinAccess') === 'granted') {
-      showMenu(false);
-    }
+    
+    if(localStorage.getItem('pinAccess') === 'granted') showMenu(false);
 
     inputs.forEach((input, index) => {
       input.addEventListener('input', (e) => {
-        const val = e.target.value;
-        if (!/^\d+$/.test(val)) { e.target.value = ""; return; }
-        if (val.length === 1) {
+        if (!/^\d+$/.test(e.target.value)) { e.target.value = ""; return; }
+        if (e.target.value.length === 1) {
           if (index < inputs.length - 1) inputs[index + 1].focus();
           else checkPin();
         }
       });
       input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !e.target.value) {
-          if (index > 0) inputs[index - 1].focus();
-        }
+        if (e.key === 'Backspace' && !e.target.value) if (index > 0) inputs[index - 1].focus();
       });
     });
 
     function checkPin() {
-      let enteredPin = '';
-      inputs.forEach(input => enteredPin += input.value);
-
-      if (enteredPin === correctPin) {
+      let pin = ''; inputs.forEach(i => pin += i.value);
+      if (pin === correctPin) {
         localStorage.setItem('pinAccess', 'granted');
-        inputs.forEach(i => i.blur());
-        showMenu(true);
+        inputs.forEach(i => i.blur()); showMenu(true);
       } else {
-        statusMsg.style.opacity = '1';
-        statusMsg.innerText = "Yanlış şifre, tekrar dene aşkım 🥺";
-        inputs.forEach(input => { input.classList.add('shake'); input.value = ''; });
-        setTimeout(() => {
-          inputs.forEach(input => input.classList.remove('shake'));
-          inputs[0].focus();
-          setTimeout(() => statusMsg.style.opacity = '0', 2000);
-        }, 500);
+        const msg = document.getElementById('status-msg');
+        msg.style.opacity = '1';
+        inputs.forEach(i => { i.classList.add('shake'); i.value = ''; });
+        setTimeout(() => { inputs.forEach(i => i.classList.remove('shake')); inputs[0].focus(); msg.style.opacity = '0'; }, 500);
       }
     }
 
     function showMenu(animate) {
-      if(animate) {
-        pinScreen.style.display = 'none';
-        menuContent.style.display = 'block';
-        menuContent.style.opacity = 0;
-        setTimeout(() => {
-            menuContent.style.opacity = 1;
-            menuContent.style.transition = 'opacity 0.5s ease';
-        }, 50);
-        spawnHeartsExplosion(); 
-      } else {
-        pinScreen.style.display = 'none';
-        menuContent.style.display = 'block';
-      }
+      const ps = document.getElementById('pin-screen');
+      const mc = document.getElementById('menu-content');
+      ps.style.display = 'none'; mc.style.display = 'block';
+      if(animate) { mc.style.opacity = 0; setTimeout(() => { mc.style.opacity = 1; mc.style.transition = 'opacity 0.5s'; }, 50); spawnHearts(); }
     }
 
-    /* ================= CANVAS 1: UÇUŞAN KALPLER ================= */
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    /* === EFEKTLER === */
+    const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
+    let parts = [];
+    function resize() { canvas.width=innerWidth; canvas.height=innerHeight; }
+    window.addEventListener('resize', resize); resize();
 
     class Heart {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * 100;
-        this.velY = Math.random() * -1.5 - 0.5;
-        this.velX = Math.random() * 1 - 0.5;
-        this.size = Math.random() * 15 + 5;
-        this.color = `rgba(255, ${Math.floor(Math.random()*100 + 150)}, ${Math.floor(Math.random()*100 + 150)}, ${Math.random()*0.5 + 0.2})`;
-      }
-      update() {
-        this.y += this.velY;
-        this.x += Math.sin(this.y * 0.01) * 0.5;
-        if(this.y < -50) { this.y = canvas.height + 50; this.x = Math.random() * canvas.width; }
-      }
-      draw() {
-        ctx.fillStyle = this.color;
-        ctx.font = `${this.size}px Arial`;
-        ctx.fillText("❤", this.x, this.y);
-      }
+      constructor() { this.x=Math.random()*canvas.width; this.y=canvas.height+100; this.v=Math.random()*2+1; this.s=Math.random()*20+10; }
+      up(){ this.y-=this.v; if(this.y<-50) this.y=canvas.height+50; }
+      draw(){ ctx.font=this.s+"px Arial"; ctx.fillStyle="rgba(255,255,255,0.5)"; ctx.fillText("❤",this.x,this.y); }
     }
+    for(let i=0;i<20;i++) parts.push(new Heart());
+    function loop(){ ctx.clearRect(0,0,canvas.width,canvas.height); parts.forEach(p=>{p.up();p.draw()}); requestAnimationFrame(loop); }
+    loop();
 
-    for(let i=0; i<30; i++) particles.push(new Heart());
+    function spawnHearts() { /* Konfeti efekti buraya eklenebilir */ }
 
-    function animateBg() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => { p.update(); p.draw(); });
-      requestAnimationFrame(animateBg);
-    }
-    animateBg();
-
-    function spawnHeartsExplosion() {
-      for(let i=0; i<20; i++) {
-         let h = new Heart();
-         h.y = canvas.height / 2; h.x = canvas.width / 2;
-         h.velY = (Math.random() - 0.5) * 10; h.velX = (Math.random() - 0.5) * 10;
-         particles.push(h);
-      }
-    }
-
-    /* ================= CANVAS 2: KAPİBARA ================= */
-    (function() {
-      const c = document.getElementById('capyCanvas');
-      let ctxC, dpr, cssW, cssH;
+    /* === KAPİBARA ÇİZİMİ === */
+    (function(){
+      const c = document.getElementById('capyCanvas'); const x = c.getContext('2d');
+      let w,h, k={x:-60,y:0,d:1};
+      function rz(){ w=c.width=innerWidth; h=c.height=140; c.style.width=w+'px'; c.style.height='140px'; }
+      window.addEventListener('resize',rz); rz();
       
-      function setupHiDPICanvas() {
-        dpr = Math.min(2, window.devicePixelRatio || 1);
-        cssW = window.innerWidth; cssH = 140;
-        c.width = Math.floor(cssW * dpr); c.height = Math.floor(cssH * dpr);
-        c.style.width = cssW + 'px'; c.style.height = cssH + 'px';
-        ctxC = c.getContext('2d'); ctxC.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-      
-      setupHiDPICanvas();
-      window.addEventListener('resize', setupHiDPICanvas);
-
-      const capy = { x: -60, y: cssH-40, w: 90, h: 55, dir: 1, speed: 50 }; 
-
-      function rrect(x,y,w,h,r,fill){
-        ctxC.beginPath(); ctxC.moveTo(x+r,y);
-        ctxC.arcTo(x+w,y,x+w,y+h,r); ctxC.arcTo(x+w,y+h,x,y+h,r);
-        ctxC.arcTo(x,y+h,x,y,r); ctxC.arcTo(x,y,x+w,y,r);
-        ctxC.closePath(); ctxC.fillStyle = fill; ctxC.fill();
-      }
-
-      function drawCapy(t) {
-        const g = ctxC.createLinearGradient(0, cssH-60, 0, cssH);
-        g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(255,255,255,0.6)');
-        ctxC.fillStyle = g; ctxC.fillRect(0, cssH-60, cssW, 60);
-
-        ctxC.save();
-        const bottomY = cssH - 20;
-        ctxC.translate(capy.x, bottomY - capy.h + 15); ctxC.scale(capy.dir, 1);
-        const walk = Math.sin(t*3.0); const bob = Math.sin(t*3.0)*1.5;
-
-        ctxC.fillStyle='#9c7a52';
-        ctxC.fillRect(-capy.w*0.3, capy.h*0.6 + walk, 14, 8);
-        ctxC.fillRect( capy.w*0.1, capy.h*0.6 - walk, 14, 8);
-
-        rrect(-capy.w/2, -capy.h/2 + bob, capy.w, capy.h, 18, '#c59a6b');
+      function dr(){
+        x.clearRect(0,0,w,h);
+        // Zemin
+        const g=x.createLinearGradient(0,80,0,140); g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(1,'rgba(255,255,255,0.4)');
+        x.fillStyle=g; x.fillRect(0,80,w,60);
         
-        ctxC.save();
-        ctxC.translate(capy.w*0.25, -capy.h*0.4 + bob);
-        rrect(0, 0, capy.w*0.35, capy.h*0.4, 10, '#c59a6b');
-        ctxC.fillStyle='#222';
-        if (Math.sin(t*2) > 0.95) ctxC.fillRect(capy.w*0.15, capy.h*0.1, 8, 2); 
-        else { ctxC.beginPath(); ctxC.arc(capy.w*0.18, capy.h*0.1, 3, 0, Math.PI*2); ctxC.fill(); }
-        ctxC.fillRect(capy.w*0.3, capy.h*0.15, 4, 3); 
-        ctxC.fillStyle='rgba(255,100,100,0.3)';
-        ctxC.beginPath(); ctxC.arc(capy.w*0.12, capy.h*0.2, 5, 0, Math.PI*2); ctxC.fill();
-        ctxC.restore();
-        ctxC.restore();
-      }
+        // Kapibara
+        x.save(); x.translate(k.x, 100); x.scale(k.d,1);
+        x.fillStyle='#8d6e63'; x.beginPath(); x.ellipse(0,0,40,25,0,0,7); x.fill(); // Vücut
+        x.beginPath(); x.arc(25,-15,15,0,7); x.fill(); // Kafa
+        x.fillStyle='#3e2723'; x.fillRect(35,-15,5,8); // Burun
+        x.fillStyle='#000'; x.beginPath(); x.arc(30,-18,3,0,7); x.fill(); // Göz
+        x.restore();
 
-      let last = performance.now();
-      function loop(now){
-        const dt = (now - last) / 1000; last = now;
-        ctxC.clearRect(0,0,cssW,cssH);
-        capy.x += capy.speed * capy.dir * dt;
-        if(capy.dir === 1 && capy.x > cssW + 50) { capy.dir = -1; } 
-        if(capy.dir === -1 && capy.x < -50) { capy.dir = 1; }     
-        drawCapy(now/1000);
-        requestAnimationFrame(loop);
+        k.x += 1.5 * k.d;
+        if(k.x > w+50) k.d = -1;
+        if(k.x < -50) k.d = 1;
+        requestAnimationFrame(dr);
       }
-      requestAnimationFrame(loop);
+      dr();
     })();
   </script>
 </body>
